@@ -1,25 +1,41 @@
 {
-  "name": "uploadjoy",
+  "name": "@uploadjoy/root",
   "version": "0.0.0",
-  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Uploadjoy/uploadjoy.git"
+  },
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "packages/*",
+    "www/*"
   ],
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev --parallel",
-    "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
-  },
-  "devDependencies": {
-    "eslint-config-custom": "workspace:*",
-    "prettier": "latest",
-    "turbo": "latest"
+    "typecheck": "turbo typecheck",
+    "build": "turbo build",
+    "build:client": "turbo --filter=client build",
+    "lint": "turbo lint",
+    "format": "turbo format && prettier --write *.{cjs,md,json}",
+    "format:check": "turbo format:check && prettier --check *.{cjs,md,json}",
+    "check": "turbo lint typecheck format:check",
+    "clean": "turbo clean && rm -rf node_modules"
   },
   "engines": {
     "node": ">=14.0.0"
   },
-  "dependencies": {},
-  "packageManager": "pnpm@7.17.1"
+  "packageManager": "pnpm@7.17.1",
+  "dependencies": {
+    "@types/node": "^18.11.10",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "eslint": "^8.28.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-turbo": "^0.0.7",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-unicorn": "^45.0.1",
+    "prettier": "^2.8.0",
+    "turbo": "^1.6.3",
+    "typescript": "^4.9.3"
+  }
 }

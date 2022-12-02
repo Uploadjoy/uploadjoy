@@ -1,0 +1,6 @@
+.turbo/
+
+tsconfig.json
+*.tsbuildinfo
+.prettierrc.cjs
+.eslintrc.cjs
