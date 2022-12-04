@@ -9,7 +9,8 @@
   },
   "workspaces": [
     "packages/*",
-    "www/*"
+    "www/*",
+    "examples/*"
   ],
   "scripts": {
     "typecheck": "turbo typecheck",

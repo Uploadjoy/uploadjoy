@@ -4,7 +4,8 @@
     "baseUrl": "./",
     "paths": {
       "~/*": ["./src/*"]
-    }
+    },
+    "outDir": "./dist"
   },
-  "include": ["src"]
+  "include": ["src/*", ".eslintrc.cjs"]
 }
