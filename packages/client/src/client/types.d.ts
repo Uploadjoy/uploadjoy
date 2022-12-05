@@ -1,3 +1,5 @@
+import type { OperationError } from "../error.js";
+
 /**
  * Options used to initialize Uploadjoy client
  *
@@ -27,10 +29,14 @@ export interface OperationOptions {
   throwOnError?: boolean;
 }
 
+// Operation is synonymous with a specific "API call" in this context
 export type Operation<
   TInput extends Record<string, unknown>,
   TOutput extends Record<string, unknown> | void,
-> = (input: TInput, opts?: OperationOptions) => Promise<TOutput>;
+> = (
+  input: TInput,
+  opts?: OperationOptions,
+) => Promise<TOutput | OperationError>;
 
 export interface APIConfig {
   presignedUrl: {
@@ -46,3 +52,13 @@ export interface APIConfig {
     >;
   };
 }
+
+export type OperationReturnType<
+  T extends keyof APIConfig,
+  K extends keyof APIConfig[T],
+> = ReturnType<APIConfig[T][K]>;
+
+export type OperationParamsType<
+  T extends keyof APIConfig,
+  K extends keyof APIConfig[T],
+> = Parameters<APIConfig[T][K]>;
