@@ -14,10 +14,12 @@ export class Uploadjoy {
   }
 
   presignedUrl: APIConfig["presignedUrl"] = {
-    privateObject: async (input, opts = { onErrorThrow: false }) => {
-      console.log(this.apiBaseUrl);
+    privateObject: async (input, opts = { throwOnError: false }) => {
+      console.log(this.apiBaseUrl, input, opts);
       console.log(this.apiToken);
-      return { input, opts };
+      return {
+        presignedUrls: [],
+      };
     },
   } as const;
 }

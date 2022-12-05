@@ -10,7 +10,8 @@
   "workspaces": [
     "packages/*",
     "www/*",
-    "examples/*"
+    "examples/*",
+    "e2e/*"
   ],
   "scripts": {
     "typecheck": "turbo typecheck",

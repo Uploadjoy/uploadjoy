@@ -13,17 +13,36 @@ export interface ClientOptions {
   _apiUrlBase?: string;
 }
 
+type HTTPMethods = "GET" | "POST" | "PUT";
+
+/**
+ * User provided options during API call.
+ */
 export interface OperationOptions {
-  onErrorThrow?: boolean;
+  /**
+   * Throw error during API call.
+   *
+   * @default false
+   */
+  throwOnError?: boolean;
 }
 
 export type Operation<
   TInput extends Record<string, unknown>,
-  TOutput extends Record<string, unknown>,
+  TOutput extends Record<string, unknown> | void,
 > = (input: TInput, opts?: OperationOptions) => Promise<TOutput>;
 
 export interface APIConfig {
   presignedUrl: {
-    privateObject: Operation<{ keys: string[] }, any>;
+    privateObject: Operation<
+      { keys: string[] },
+      {
+        presignedUrls: {
+          key: string;
+          url?: string;
+          error?: string;
+        }[];
+      }
+    >;
   };
 }
