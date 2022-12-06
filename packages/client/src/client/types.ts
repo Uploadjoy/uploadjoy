@@ -14,9 +14,6 @@ export interface ClientOptions {
    */
   _apiUrlBase?: string;
 }
-
-type HTTPMethods = "GET" | "POST" | "PUT";
-
 /**
  * User provided options during API call.
  */
@@ -38,27 +35,35 @@ export type Operation<
   opts?: OperationOptions,
 ) => Promise<TOutput | OperationError>;
 
-export interface APIConfig {
-  presignedUrl: {
-    privateObject: Operation<
-      { keys: string[] },
-      {
-        presignedUrls: {
-          key: string;
-          url?: string;
-          error?: string;
-        }[];
-      }
-    >;
+interface PresignedUrlOperationConfigs {
+  privateObject: {
+    input: { keys: string[] };
+    output: {
+      presignedUrls: {
+        key: string;
+        url?: string;
+        error?: string;
+      }[];
+    };
   };
 }
 
+export type PresignedUrlApi = <TOp extends keyof PresignedUrlOperationConfigs>(
+  key: TOp,
+  input: PresignedUrlOperationConfigs[TOp]["input"],
+  opts?: OperationOptions,
+) => Promise<
+  PresignedUrlOperationConfigs[TOp]["output"] | OperationError | void
+>;
+
+export interface APIConfig {
+  presignedUrl: PresignedUrlApi;
+}
+
 export type OperationReturnType<
-  T extends keyof APIConfig,
-  K extends keyof APIConfig[T],
-> = ReturnType<APIConfig[T][K]>;
+  TOp extends keyof PresignedUrlOperationConfigs,
+> = PresignedUrlOperationConfigs[TOp]["output"];
 
 export type OperationParamsType<
-  T extends keyof APIConfig,
-  K extends keyof APIConfig[T],
-> = Parameters<APIConfig[T][K]>;
+  TOp extends keyof PresignedUrlOperationConfigs,
+> = PresignedUrlOperationConfigs[TOp]["input"];

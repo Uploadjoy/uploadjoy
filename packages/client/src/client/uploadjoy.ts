@@ -5,6 +5,7 @@ import {
   ClientOptions,
   OperationParamsType,
   OperationReturnType,
+  PresignedUrlApi,
 } from "./types.js";
 
 /**
@@ -19,16 +20,20 @@ export class Uploadjoy {
     if (_apiUrlBase) this.apiBaseUrl = _apiUrlBase;
   }
 
-  _createApiUrl = (endpoint: string) => {
+  #createApiUrl = (endpoint: string) => {
     return `${this.apiBaseUrl}${endpoint}`;
   };
 
-  presignedUrl: APIConfig["presignedUrl"] = {
-    privateObject: async (input, opts = { throwOnError: false }) => {
-      const url = this._createApiUrl(ENDPOINTS.presignedUrl.privateObject);
+  public presignedUrl: APIConfig["presignedUrl"] = async (
+    key,
+    input,
+    opts = { throwOnError: false },
+  ) => {
+    if (key === "privateObject") {
+      const url = this.#createApiUrl(ENDPOINTS.presignedUrl.privateObject);
       const response = await callApi<
-        OperationParamsType<"presignedUrl", "privateObject">[0],
-        OperationReturnType<"presignedUrl", "privateObject">
+        OperationParamsType<typeof key>,
+        OperationReturnType<typeof key>
       >({
         url,
         method: "GET",
@@ -37,6 +42,7 @@ export class Uploadjoy {
         input,
       });
       return response;
-    },
-  } as const;
+    }
+    return;
+  };
 }
