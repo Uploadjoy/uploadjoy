@@ -35,7 +35,7 @@ export type Operation<
   opts?: OperationOptions,
 ) => Promise<TOutput | OperationError>;
 
-interface PresignedUrlOperationConfigs {
+type PresignedUrlOperationConfigs = {
   privateObject: {
     input: { keys: string[] };
     output: {
@@ -46,7 +46,7 @@ interface PresignedUrlOperationConfigs {
       }[];
     };
   };
-}
+};
 
 export type PresignedUrlApi = <TOp extends keyof PresignedUrlOperationConfigs>(
   key: TOp,
@@ -56,9 +56,9 @@ export type PresignedUrlApi = <TOp extends keyof PresignedUrlOperationConfigs>(
   PresignedUrlOperationConfigs[TOp]["output"] | OperationError | void
 >;
 
-export interface APIConfig {
+export type APIConfig = {
   presignedUrl: PresignedUrlApi;
-}
+};
 
 export type OperationReturnType<
   TOp extends keyof PresignedUrlOperationConfigs,

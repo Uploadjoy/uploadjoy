@@ -5,7 +5,6 @@ import {
   ClientOptions,
   OperationParamsType,
   OperationReturnType,
-  PresignedUrlApi,
 } from "./types.js";
 
 /**
