@@ -37,7 +37,12 @@ export type Operation<
 
 type PresignedUrlOperationConfigs = {
   privateObject: {
-    input: { keys: string[] };
+    input: {
+      keys: string[];
+      presignedUrlOptions: {
+        expiresIn: number;
+      };
+    };
     output: {
       presignedUrls: {
         key: string;

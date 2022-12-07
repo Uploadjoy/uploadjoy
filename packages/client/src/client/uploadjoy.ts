@@ -35,7 +35,7 @@ export class Uploadjoy {
         OperationReturnType<typeof key>
       >({
         url,
-        method: "GET",
+        method: "POST",
         token: this.apiToken,
         options: opts,
         input,

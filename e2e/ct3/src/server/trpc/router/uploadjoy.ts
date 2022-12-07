@@ -11,12 +11,17 @@ export const uploadjoyRouter = router({
       const { keys } = input;
       console.info("Input keys: ", keys);
       try {
-        const response = await uj.presignedUrl("privateObject", { keys });
+        const response = await uj.presignedUrl("privateObject", {
+          keys,
+          presignedUrlOptions: { expiresIn: 3600 },
+        });
         console.info("UploadJoy response: ", response);
       } catch (e) {
         console.error("Error calling UJ client: ", e);
+        return {};
       } finally {
         console.log("\n\n");
+        return {};
       }
     }),
 });
