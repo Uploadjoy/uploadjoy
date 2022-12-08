@@ -35,13 +35,22 @@ export type Operation<
   opts?: OperationOptions,
 ) => Promise<TOutput | OperationError>;
 
+type Visibility = "public" | "private";
+type PresignedUrlOptions = {
+  /**
+   * URL expiration in seconds.
+   */
+  expiresIn?: number;
+};
+
 type PresignedUrlOperationConfigs = {
-  privateObject: {
+  getPrivateObjects: {
     input: {
+      /**
+       * Object keys to get presigned URLs for.
+       */
       keys: string[];
-      presignedUrlOptions: {
-        expiresIn: number;
-      };
+      presignedUrlOptions?: PresignedUrlOptions;
     };
     output: {
       presignedUrls: {
@@ -51,15 +60,37 @@ type PresignedUrlOperationConfigs = {
       }[];
     };
   };
+  putObjects: {
+    input: {
+      objects: {
+        key: string;
+        visibility: Visibility;
+        presignedUrlOptions?: PresignedUrlOptions;
+      }[];
+    };
+    output: {
+      presignedUrls: (
+        | {
+            key: string;
+            visibility: Visibility;
+            url: string;
+            fields: Record<string, string>;
+          }
+        | {
+            key: string;
+            visibility: Visibility;
+            error: string;
+          }
+      )[];
+    };
+  };
 };
 
 export type PresignedUrlApi = <TOp extends keyof PresignedUrlOperationConfigs>(
   key: TOp,
   input: PresignedUrlOperationConfigs[TOp]["input"],
   opts?: OperationOptions,
-) => Promise<
-  PresignedUrlOperationConfigs[TOp]["output"] | OperationError | void
->;
+) => Promise<PresignedUrlOperationConfigs[TOp]["output"] | OperationError>;
 
 export type APIConfig = {
   presignedUrl: PresignedUrlApi;

@@ -8,9 +8,6 @@ export class OperationError extends Error {
     this.body = body;
   }
 
-  /**
-   * Get Error Info as JSON
-   */
   toJSON() {
     return {
       statusCode: this.statusCode,

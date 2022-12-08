@@ -8,7 +8,9 @@ const Home: NextPage = () => {
   const { data } = trpc.uploadjoy.privateObject.useQuery({
     keys: ["stripe-product.png"],
   });
-  console.log(data);
+  const { data: putObjectsData } = trpc.uploadjoy.putObjects.useQuery();
+  console.log("uploadjoy.privateObject: ", data);
+  console.log("uploadjoy.putObjects: ", putObjectsData);
   return (
     <>
       <main className={styles.main}>

@@ -1,3 +1,4 @@
+import { OperationError } from "../error.js";
 import { API_BASE, ENDPOINTS } from "../constants.js";
 import { callApi } from "./call.js";
 import {
@@ -28,8 +29,16 @@ export class Uploadjoy {
     input,
     opts = { throwOnError: false },
   ) => {
-    if (key === "privateObject") {
-      const url = this.#createApiUrl(ENDPOINTS.presignedUrl.privateObject);
+    let url: string | undefined;
+    if (key === "getPrivateObjects") {
+      url = this.#createApiUrl(ENDPOINTS.presignedUrl.getPrivateObjects);
+    }
+
+    if (key === "putObjects") {
+      url = this.#createApiUrl(ENDPOINTS.presignedUrl.putObjects);
+    }
+
+    if (url) {
       const response = await callApi<
         OperationParamsType<typeof key>,
         OperationReturnType<typeof key>
@@ -42,6 +51,10 @@ export class Uploadjoy {
       });
       return response;
     }
-    return;
+
+    if (opts.throwOnError) {
+      throw new OperationError(500, { error: "unknown error" });
+    }
+    return new OperationError(500, { error: "unknown error" });
   };
 }

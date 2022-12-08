@@ -11,10 +11,14 @@ export const uploadjoyRouter = router({
       const { keys } = input;
       console.info("Input keys: ", keys);
       try {
-        const response = await uj.presignedUrl("privateObject", {
-          keys,
-          presignedUrlOptions: { expiresIn: 3600 },
-        });
+        const response = await uj.presignedUrl(
+          "getPrivateObjects",
+          {
+            keys,
+            presignedUrlOptions: { expiresIn: 3600 },
+          },
+          { throwOnError: false },
+        );
         console.info("UploadJoy response: ", response);
       } catch (e) {
         console.error("Error calling UJ client: ", e);
@@ -24,4 +28,29 @@ export const uploadjoyRouter = router({
         return {};
       }
     }),
+  putObjects: publicProcedure.query(async ({ input, ctx }) => {
+    console.info("Uploadjoy presignedUrl putObjects API call");
+    const uj = ctx.uploadJoy;
+    try {
+      const response = await uj.presignedUrl(
+        "putObjects",
+        {
+          objects: [
+            {
+              key: "new.jpg",
+              visibility: "private",
+            },
+          ],
+        },
+        { throwOnError: false },
+      );
+      console.info("UploadJoy response: ", response);
+    } catch (e) {
+      console.error("Error calling UJ client: ", e);
+      return {};
+    } finally {
+      console.log("\n\n");
+      return {};
+    }
+  }),
 });
