@@ -9,8 +9,10 @@ const Home: NextPage = () => {
     keys: ["stripe-product.png"],
   });
   const { data: putObjectsData } = trpc.uploadjoy.putObjects.useQuery();
+  const { data: mpUploadData } = trpc.uploadjoy.multiPartPresignUrl.useQuery();
   console.log("uploadjoy.privateObject: ", data);
   console.log("uploadjoy.putObjects: ", putObjectsData);
+  console.log("uploadjoy.multiPartPresignUrl: ", mpUploadData);
   return (
     <>
       <main className={styles.main}>

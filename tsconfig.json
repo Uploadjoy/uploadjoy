@@ -1,5 +1,5 @@
 {
-  "include": ["packages", "www", "e2e"],
+  "include": ["packages", "www", "examples"],
   "compilerOptions": {
     /* LANGUAGE COMPILATION OPTIONS */
     "target": "ES2020",

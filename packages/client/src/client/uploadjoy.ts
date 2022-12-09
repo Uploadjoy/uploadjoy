@@ -4,8 +4,10 @@ import { callApi } from "./call.js";
 import {
   APIConfig,
   ClientOptions,
+  MultipartUploadApiGroupConfig,
   OperationParamsType,
   OperationReturnType,
+  PresignedUrlApiGroupConfig,
 } from "./types.js";
 
 /**
@@ -38,10 +40,48 @@ export class Uploadjoy {
       url = this.#createApiUrl(ENDPOINTS.presignedUrl.putObjects);
     }
 
+    if (key === "multipartUploadObject") {
+      url = this.#createApiUrl(ENDPOINTS.presignedUrl.multipartUploadObject);
+    }
+
     if (url) {
       const response = await callApi<
-        OperationParamsType<typeof key>,
-        OperationReturnType<typeof key>
+        OperationParamsType<PresignedUrlApiGroupConfig, typeof key>,
+        OperationReturnType<PresignedUrlApiGroupConfig, typeof key>
+      >({
+        url,
+        method: "POST",
+        token: this.apiToken,
+        options: opts,
+        input,
+      });
+      return response;
+    }
+
+    if (opts.throwOnError) {
+      throw new OperationError(500, { error: "unknown error" });
+    }
+    return new OperationError(500, { error: "unknown error" });
+  };
+
+  public multipartUpload: APIConfig["multipartUpload"] = async (
+    key,
+    input,
+    opts = { throwOnError: false },
+  ) => {
+    let url: string | undefined;
+    if (key === "complete") {
+      url = this.#createApiUrl(ENDPOINTS.multipartUpload.complete);
+    }
+
+    if (key === "abort") {
+      url = this.#createApiUrl(ENDPOINTS.multipartUpload.abort);
+    }
+
+    if (url) {
+      const response = await callApi<
+        OperationParamsType<MultipartUploadApiGroupConfig, typeof key>,
+        OperationReturnType<MultipartUploadApiGroupConfig, typeof key>
       >({
         url,
         method: "POST",

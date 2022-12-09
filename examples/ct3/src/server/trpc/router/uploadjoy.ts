@@ -53,4 +53,46 @@ export const uploadjoyRouter = router({
       return {};
     }
   }),
+  multiPartPresignUrl: publicProcedure.query(async ({ input, ctx }) => {
+    console.info("Uploadjoy presignedUrl multipartUploadObject API call");
+    const uj = ctx.uploadJoy;
+    try {
+      const response = await uj.presignedUrl("multipartUploadObject", {
+        key: "key.jpg",
+        filePartNames: ["1.jpg"],
+        visibility: "private",
+      });
+      console.info("UploadJoy response: ", response);
+    } catch (e) {
+      console.error("Error calling UJ client: ", e);
+      return {};
+    } finally {
+      console.log("\n\n");
+      return {};
+    }
+  }),
+  completeMultiPartUpload: publicProcedure.query(async ({ input, ctx }) => {
+    console.info("Uploadjoy multipart upload complete API call");
+    const uj = ctx.uploadJoy;
+    try {
+      const response = await uj.multipartUpload("complete", {
+        uploadId: "test",
+        visibility: "private",
+        key: "key.jpg",
+        completedParts: [
+          {
+            partNumber: 1,
+            eTag: "test",
+          },
+        ],
+      });
+      console.info("UploadJoy response: ", response);
+    } catch (e) {
+      console.error("Error calling UJ client: ", e);
+      return {};
+    } finally {
+      console.log("\n\n");
+      return {};
+    }
+  }),
 });

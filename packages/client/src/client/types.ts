@@ -14,6 +14,17 @@ export interface ClientOptions {
    */
   _apiUrlBase?: string;
 }
+
+type APIGroupConfig = Record<string, { input: any; output: any }>;
+
+type ApiGroup<TConfig extends APIGroupConfig> = <
+  TOperation extends keyof TConfig,
+>(
+  key: TOperation,
+  input: TConfig[TOperation]["input"],
+  opts?: OperationOptions,
+) => Promise<TConfig[TOperation]["output"] | OperationError>;
+
 /**
  * User provided options during API call.
  */
@@ -43,7 +54,7 @@ type PresignedUrlOptions = {
   expiresIn?: number;
 };
 
-type PresignedUrlOperationConfigs = {
+export type PresignedUrlApiGroupConfig = {
   getPrivateObjects: {
     input: {
       /**
@@ -84,22 +95,76 @@ type PresignedUrlOperationConfigs = {
       )[];
     };
   };
+  multipartUploadObject: {
+    input: {
+      key: string;
+      visibility: Visibility;
+      presignedUrlOptions?: PresignedUrlOptions;
+      filePartNames: string[];
+    };
+    output: {
+      key: string;
+      visibility: Visibility;
+      uploadId: string;
+      presignedUrls:
+        | {
+            filePartName: string;
+            url: string;
+            fields: Record<string, string>;
+            partNumber: number;
+          }
+        | {
+            filePartName: string;
+            error: string;
+          }[];
+    };
+  };
 };
 
-export type PresignedUrlApi = <TOp extends keyof PresignedUrlOperationConfigs>(
-  key: TOp,
-  input: PresignedUrlOperationConfigs[TOp]["input"],
-  opts?: OperationOptions,
-) => Promise<PresignedUrlOperationConfigs[TOp]["output"] | OperationError>;
+type PresignedUrlApi = ApiGroup<PresignedUrlApiGroupConfig>;
+
+export type MultipartUploadApiGroupConfig = {
+  complete: {
+    input: {
+      uploadId: string;
+      key: string;
+      visibility: Visibility;
+      completedParts: {
+        partNumber: number;
+        eTag: string;
+      }[];
+    };
+    output: {
+      uploadId: string;
+      key: string;
+    };
+  };
+  abort: {
+    input: {
+      uploadId: string;
+      visibility: Visibility;
+      key: string;
+    };
+    output: {
+      uploadId: string;
+      key: string;
+    };
+  };
+};
+
+type MultipartUploadApi = ApiGroup<MultipartUploadApiGroupConfig>;
 
 export type APIConfig = {
   presignedUrl: PresignedUrlApi;
+  multipartUpload: MultipartUploadApi;
 };
 
 export type OperationReturnType<
-  TOp extends keyof PresignedUrlOperationConfigs,
-> = PresignedUrlOperationConfigs[TOp]["output"];
+  TConfig extends APIGroupConfig,
+  TOperation extends keyof TConfig,
+> = TConfig[TOperation]["output"];
 
 export type OperationParamsType<
-  TOp extends keyof PresignedUrlOperationConfigs,
-> = PresignedUrlOperationConfigs[TOp]["input"];
+  TConfig extends APIGroupConfig,
+  TOperation extends keyof TConfig,
+> = TConfig[TOperation]["input"];
