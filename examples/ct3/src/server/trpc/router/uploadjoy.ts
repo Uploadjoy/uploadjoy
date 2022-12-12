@@ -6,7 +6,7 @@ export const uploadjoyRouter = router({
   privateObject: publicProcedure
     .input(z.object({ keys: z.array(z.string()) }))
     .query(async ({ input, ctx }) => {
-      console.info("Uploadjoy presignedUrl privateObject API call");
+      console.info("Uploadjoy presignedUrl.downloadPrivateObjects API call");
       const uj = ctx.uploadJoy;
       const { keys } = input;
       console.info("Input keys: ", keys);
@@ -28,7 +28,7 @@ export const uploadjoyRouter = router({
       }
     }),
   putObjects: publicProcedure.query(async ({ input, ctx }) => {
-    console.info("Uploadjoy presignedUrl putObjects API call");
+    console.info("Uploadjoy presignedUrl.uploadObjects API call");
     const uj = ctx.uploadJoy;
     try {
       const response = await uj.presignedUrl.uploadObjects(
@@ -52,7 +52,7 @@ export const uploadjoyRouter = router({
     }
   }),
   multiPartPresignUrl: publicProcedure.query(async ({ input, ctx }) => {
-    console.info("Uploadjoy presignedUrl multipartUploadObject API call");
+    console.info("Uploadjoy presignedUrl.multipartUploadObject API call");
     const uj = ctx.uploadJoy;
     try {
       const response = await uj.presignedUrl.multipartUploadObject({
@@ -70,7 +70,7 @@ export const uploadjoyRouter = router({
     }
   }),
   completeMultiPartUpload: publicProcedure.query(async ({ input, ctx }) => {
-    console.info("Uploadjoy multipart upload complete API call");
+    console.info("Uploadjoy multipartUpload.complete API call");
     const uj = ctx.uploadJoy;
     try {
       const response = await uj.multipartUpload.complete({
