@@ -1,10 +1,9 @@
-import { OperationError } from "../error.js";
 import { API_BASE, ENDPOINTS } from "../constants.js";
 import { callApi } from "./call.js";
 import {
-  APIConfig,
   ClientOptions,
   MultipartUploadApiGroupConfig,
+  OperationOptions,
   OperationParamsType,
   OperationReturnType,
   PresignedUrlApiGroupConfig,
@@ -26,28 +25,26 @@ export class Uploadjoy {
     return `${this.apiBaseUrl}${endpoint}`;
   };
 
-  public presignedUrl: APIConfig["presignedUrl"] = async (
-    key,
-    input,
-    opts = { throwOnError: false },
-  ) => {
-    let url: string | undefined;
-    if (key === "getPrivateObjects") {
-      url = this.#createApiUrl(ENDPOINTS.presignedUrl.getPrivateObjects);
-    }
-
-    if (key === "putObjects") {
-      url = this.#createApiUrl(ENDPOINTS.presignedUrl.putObjects);
-    }
-
-    if (key === "multipartUploadObject") {
-      url = this.#createApiUrl(ENDPOINTS.presignedUrl.multipartUploadObject);
-    }
-
-    if (url) {
+  public readonly presignedUrl = {
+    downloadPrivateObjects: async (
+      input: OperationParamsType<
+        PresignedUrlApiGroupConfig,
+        "downloadPrivateObjects"
+      >,
+      opts: OperationOptions = { throwOnError: false },
+    ) => {
+      const url = this.#createApiUrl(
+        ENDPOINTS.presignedUrl.downloadPrivateObjects,
+      );
       const response = await callApi<
-        OperationParamsType<PresignedUrlApiGroupConfig, typeof key>,
-        OperationReturnType<PresignedUrlApiGroupConfig, typeof key>
+        OperationParamsType<
+          PresignedUrlApiGroupConfig,
+          "downloadPrivateObjects"
+        >,
+        OperationReturnType<
+          PresignedUrlApiGroupConfig,
+          "downloadPrivateObjects"
+        >
       >({
         url,
         method: "POST",
@@ -56,32 +53,62 @@ export class Uploadjoy {
         input,
       });
       return response;
-    }
+    },
 
-    if (opts.throwOnError) {
-      throw new OperationError(500, { error: "unknown error" });
-    }
-    return new OperationError(500, { error: "unknown error" });
+    uploadObjects: async (
+      input: OperationParamsType<PresignedUrlApiGroupConfig, "uploadObjects">,
+      opts: OperationOptions = { throwOnError: false },
+    ) => {
+      const url = this.#createApiUrl(ENDPOINTS.presignedUrl.uploadObjects);
+      const response = await callApi<
+        OperationParamsType<PresignedUrlApiGroupConfig, "uploadObjects">,
+        OperationReturnType<PresignedUrlApiGroupConfig, "uploadObjects">
+      >({
+        url,
+        method: "POST",
+        token: this.apiToken,
+        options: opts,
+        input,
+      });
+      return response;
+    },
+
+    multipartUploadObject: async (
+      input: OperationParamsType<
+        PresignedUrlApiGroupConfig,
+        "multipartUploadObject"
+      >,
+      opts: OperationOptions = { throwOnError: false },
+    ) => {
+      const url = this.#createApiUrl(
+        ENDPOINTS.presignedUrl.multipartUploadObject,
+      );
+      const response = await callApi<
+        OperationParamsType<
+          PresignedUrlApiGroupConfig,
+          "multipartUploadObject"
+        >,
+        OperationReturnType<PresignedUrlApiGroupConfig, "multipartUploadObject">
+      >({
+        url,
+        method: "POST",
+        token: this.apiToken,
+        options: opts,
+        input,
+      });
+      return response;
+    },
   };
 
-  public multipartUpload: APIConfig["multipartUpload"] = async (
-    key,
-    input,
-    opts = { throwOnError: false },
-  ) => {
-    let url: string | undefined;
-    if (key === "complete") {
-      url = this.#createApiUrl(ENDPOINTS.multipartUpload.complete);
-    }
-
-    if (key === "abort") {
-      url = this.#createApiUrl(ENDPOINTS.multipartUpload.abort);
-    }
-
-    if (url) {
+  public readonly multipartUpload = {
+    complete: async (
+      input: OperationParamsType<MultipartUploadApiGroupConfig, "complete">,
+      opts: OperationOptions = { throwOnError: false },
+    ) => {
+      const url = this.#createApiUrl(ENDPOINTS.multipartUpload.complete);
       const response = await callApi<
-        OperationParamsType<MultipartUploadApiGroupConfig, typeof key>,
-        OperationReturnType<MultipartUploadApiGroupConfig, typeof key>
+        OperationParamsType<MultipartUploadApiGroupConfig, "complete">,
+        OperationReturnType<MultipartUploadApiGroupConfig, "complete">
       >({
         url,
         method: "POST",
@@ -90,11 +117,23 @@ export class Uploadjoy {
         input,
       });
       return response;
-    }
-
-    if (opts.throwOnError) {
-      throw new OperationError(500, { error: "unknown error" });
-    }
-    return new OperationError(500, { error: "unknown error" });
+    },
+    abort: async (
+      input: OperationParamsType<MultipartUploadApiGroupConfig, "abort">,
+      opts: OperationOptions = { throwOnError: false },
+    ) => {
+      const url = this.#createApiUrl(ENDPOINTS.multipartUpload.abort);
+      const response = await callApi<
+        OperationParamsType<MultipartUploadApiGroupConfig, "abort">,
+        OperationReturnType<MultipartUploadApiGroupConfig, "abort">
+      >({
+        url,
+        method: "POST",
+        token: this.apiToken,
+        options: opts,
+        input,
+      });
+      return response;
+    },
   };
 }

@@ -17,14 +17,6 @@ export interface ClientOptions {
 
 type APIGroupConfig = Record<string, { input: any; output: any }>;
 
-type ApiGroup<TConfig extends APIGroupConfig> = <
-  TOperation extends keyof TConfig,
->(
-  key: TOperation,
-  input: TConfig[TOperation]["input"],
-  opts?: OperationOptions,
-) => Promise<TConfig[TOperation]["output"] | OperationError>;
-
 /**
  * User provided options during API call.
  */
@@ -40,7 +32,7 @@ export interface OperationOptions {
 // Operation is synonymous with a specific "API call" in this context
 export type Operation<
   TInput extends Record<string, unknown>,
-  TOutput extends Record<string, unknown> | void,
+  TOutput extends Record<string, unknown>,
 > = (
   input: TInput,
   opts?: OperationOptions,
@@ -55,7 +47,7 @@ type PresignedUrlOptions = {
 };
 
 export type PresignedUrlApiGroupConfig = {
-  getPrivateObjects: {
+  downloadPrivateObjects: {
     input: {
       /**
        * Object keys to get presigned URLs for.
@@ -71,7 +63,7 @@ export type PresignedUrlApiGroupConfig = {
       }[];
     };
   };
-  putObjects: {
+  uploadObjects: {
     input: {
       objects: {
         key: string;
@@ -121,8 +113,6 @@ export type PresignedUrlApiGroupConfig = {
   };
 };
 
-type PresignedUrlApi = ApiGroup<PresignedUrlApiGroupConfig>;
-
 export type MultipartUploadApiGroupConfig = {
   complete: {
     input: {
@@ -150,13 +140,6 @@ export type MultipartUploadApiGroupConfig = {
       key: string;
     };
   };
-};
-
-type MultipartUploadApi = ApiGroup<MultipartUploadApiGroupConfig>;
-
-export type APIConfig = {
-  presignedUrl: PresignedUrlApi;
-  multipartUpload: MultipartUploadApi;
 };
 
 export type OperationReturnType<

@@ -11,8 +11,7 @@ export const uploadjoyRouter = router({
       const { keys } = input;
       console.info("Input keys: ", keys);
       try {
-        const response = await uj.presignedUrl(
-          "getPrivateObjects",
+        const response = await uj.presignedUrl.downloadPrivateObjects(
           {
             keys,
             presignedUrlOptions: { expiresIn: 3600 },
@@ -32,8 +31,7 @@ export const uploadjoyRouter = router({
     console.info("Uploadjoy presignedUrl putObjects API call");
     const uj = ctx.uploadJoy;
     try {
-      const response = await uj.presignedUrl(
-        "putObjects",
+      const response = await uj.presignedUrl.uploadObjects(
         {
           objects: [
             {
@@ -57,7 +55,7 @@ export const uploadjoyRouter = router({
     console.info("Uploadjoy presignedUrl multipartUploadObject API call");
     const uj = ctx.uploadJoy;
     try {
-      const response = await uj.presignedUrl("multipartUploadObject", {
+      const response = await uj.presignedUrl.multipartUploadObject({
         key: "key.jpg",
         filePartNames: ["1.jpg"],
         visibility: "private",
@@ -75,7 +73,7 @@ export const uploadjoyRouter = router({
     console.info("Uploadjoy multipart upload complete API call");
     const uj = ctx.uploadJoy;
     try {
-      const response = await uj.multipartUpload("complete", {
+      const response = await uj.multipartUpload.complete({
         uploadId: "test",
         visibility: "private",
         key: "key.jpg",

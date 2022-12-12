@@ -5,6 +5,4 @@ and documentation website.
 
 Source for the Node Client is located in `packages/client`.
 
-Source for documentation is located in `www`.
-
-An example Next.js app in located in `e2e` for testing the client.
+An example Next.js app in located in `examples` for testing the client.
