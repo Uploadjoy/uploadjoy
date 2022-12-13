@@ -26,7 +26,7 @@ npm install --save @uploadjoy/client
 import { Uploadjoy } from "@uploadjoy/client";
 
 export const ujClient = new Uploadjoy({
-  apiToken: 'abcdefg',
+  apiToken: "abcdefg",
 });
 ```
 
