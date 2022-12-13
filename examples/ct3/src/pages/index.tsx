@@ -5,19 +5,16 @@ import Link from "next/link";
 import { trpc } from "../utils/trpc";
 
 const Home: NextPage = () => {
-  const { data } = trpc.uploadjoy.privateObject.useQuery({
-    keys: ["stripe-product.png"],
-  });
-  const { data: putObjectsData } = trpc.uploadjoy.putObjects.useQuery();
-  const { data: mpUploadData } = trpc.uploadjoy.multiPartPresignUrl.useQuery();
-  const abortMultiPartUpload = trpc.uploadjoy.abortMultiPartUpload.useQuery(
-    {
-      key: mpUploadData?.data ? mpUploadData.data.key : "",
-      uploadId: mpUploadData?.data ? mpUploadData.data.uploadId : "",
-    },
-    { enabled: mpUploadData?.data !== undefined },
-  );
-  console.log(abortMultiPartUpload.data);
+  const { data: downloadPrivateObjectData } =
+    trpc.uploadjoy.downloadPrivateObject.useQuery({
+      keys: ["private.png"],
+    });
+  const { data: uploadObjectsData } = trpc.uploadjoy.uploadObjects.useQuery();
+  const { data: mpUploadData } =
+    trpc.uploadjoy.multipartUploadObject.useQuery();
+  const abortMultiPartUpload =
+    trpc.uploadjoy.abortMultiPartUpload.useMutation();
+
   return (
     <>
       <main className={styles.main}>

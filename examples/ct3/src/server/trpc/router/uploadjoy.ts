@@ -3,13 +3,12 @@ import { z } from "zod";
 import { router, publicProcedure } from "../trpc";
 
 export const uploadjoyRouter = router({
-  privateObject: publicProcedure
+  downloadPrivateObject: publicProcedure
     .input(z.object({ keys: z.array(z.string()) }))
     .query(async ({ input, ctx }) => {
       console.info("Uploadjoy presignedUrl.downloadPrivateObjects API call");
       const uj = ctx.uploadJoy;
       const { keys } = input;
-      console.info("Input keys: ", keys);
       try {
         const response = await uj.presignedUrl.downloadPrivateObjects(
           {
@@ -21,13 +20,10 @@ export const uploadjoyRouter = router({
         console.info("UploadJoy response: ", response);
       } catch (e) {
         console.error("Error calling UJ client: ", e);
-        return {};
-      } finally {
-        console.log("\n\n");
-        return {};
+        throw e;
       }
     }),
-  putObjects: publicProcedure.query(async ({ input, ctx }) => {
+  uploadObjects: publicProcedure.query(async ({ input, ctx }) => {
     console.info("Uploadjoy presignedUrl.uploadObjects API call");
     const uj = ctx.uploadJoy;
     try {
@@ -45,13 +41,10 @@ export const uploadjoyRouter = router({
       console.info("UploadJoy response: ", response);
     } catch (e) {
       console.error("Error calling UJ client: ", e);
-      return {};
-    } finally {
-      console.log("\n\n");
-      return {};
+      throw e;
     }
   }),
-  multiPartPresignUrl: publicProcedure.query(async ({ input, ctx }) => {
+  multipartUploadObject: publicProcedure.query(async ({ input, ctx }) => {
     console.info("Uploadjoy presignedUrl.multipartUploadObject API call");
     const uj = ctx.uploadJoy;
     try {
@@ -61,7 +54,7 @@ export const uploadjoyRouter = router({
         visibility: "private",
       });
       console.info("UploadJoy response: ", response);
-      return response;
+      return response.data;
     } catch (e) {
       console.error("Error calling UJ client: ", e);
       throw e;
@@ -72,21 +65,22 @@ export const uploadjoyRouter = router({
       z.object({
         uploadId: z.string(),
         key: z.string(),
+        completedParts: z.array(
+          z.object({
+            partNumber: z.number(),
+            eTag: z.string(),
+          }),
+        ),
       }),
     )
-    .query(async ({ input, ctx }) => {
+    .mutation(async ({ input, ctx }) => {
       console.info("Uploadjoy multipartUpload.complete API call");
       const uj = ctx.uploadJoy;
       try {
         const response = await uj.multipartUpload.complete({
           uploadId: input.uploadId,
           key: input.key,
-          completedParts: [
-            {
-              partNumber: 1,
-              eTag: "test",
-            },
-          ],
+          completedParts: input.completedParts,
         });
         console.info("UploadJoy response: ", response);
         console.log("\n\n");
@@ -104,7 +98,7 @@ export const uploadjoyRouter = router({
         key: z.string(),
       }),
     )
-    .query(async ({ input, ctx }) => {
+    .mutation(async ({ input, ctx }) => {
       console.info("Uploadjoy multipartUpload.abort API call");
       const uj = ctx.uploadJoy;
       try {
@@ -116,10 +110,7 @@ export const uploadjoyRouter = router({
         return response;
       } catch (e) {
         console.error("Error calling UJ client: ", e);
-        return {};
-      } finally {
-        console.log("\n\n");
-        return {};
+        throw e;
       }
     }),
 });
