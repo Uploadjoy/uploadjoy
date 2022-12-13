@@ -1,4 +1,8 @@
-import type { OperationError } from "../error.js";
+export interface HTTPError extends Record<string, unknown> {
+  statusCode: number;
+  message?: string;
+  body: any;
+}
 
 /**
  * Options used to initialize Uploadjoy client
@@ -33,10 +37,7 @@ export interface OperationOptions {
 export type Operation<
   TInput extends Record<string, unknown>,
   TOutput extends Record<string, unknown>,
-> = (
-  input: TInput,
-  opts?: OperationOptions,
-) => Promise<TOutput | OperationError>;
+> = (input: TInput, opts?: OperationOptions) => Promise<TOutput | HTTPError>;
 
 type Visibility = "public" | "private";
 type PresignedUrlOptions = {

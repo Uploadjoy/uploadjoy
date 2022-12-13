@@ -61,36 +61,65 @@ export const uploadjoyRouter = router({
         visibility: "private",
       });
       console.info("UploadJoy response: ", response);
+      return response;
     } catch (e) {
       console.error("Error calling UJ client: ", e);
-      return {};
-    } finally {
-      console.log("\n\n");
-      return {};
+      throw e;
     }
   }),
-  completeMultiPartUpload: publicProcedure.query(async ({ input, ctx }) => {
-    console.info("Uploadjoy multipartUpload.complete API call");
-    const uj = ctx.uploadJoy;
-    try {
-      const response = await uj.multipartUpload.complete({
-        uploadId: "test",
-        visibility: "private",
-        key: "key.jpg",
-        completedParts: [
-          {
-            partNumber: 1,
-            eTag: "test",
-          },
-        ],
-      });
-      console.info("UploadJoy response: ", response);
-    } catch (e) {
-      console.error("Error calling UJ client: ", e);
-      return {};
-    } finally {
-      console.log("\n\n");
-      return {};
-    }
-  }),
+  completeMultiPartUpload: publicProcedure
+    .input(
+      z.object({
+        uploadId: z.string(),
+        key: z.string(),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      console.info("Uploadjoy multipartUpload.complete API call");
+      const uj = ctx.uploadJoy;
+      try {
+        const response = await uj.multipartUpload.complete({
+          uploadId: input.uploadId,
+          key: input.key,
+          completedParts: [
+            {
+              partNumber: 1,
+              eTag: "test",
+            },
+          ],
+        });
+        console.info("UploadJoy response: ", response);
+        console.log("\n\n");
+        return response;
+      } catch (e) {
+        console.error("Error calling UJ client: ", e);
+        console.log("\n\n");
+        throw e;
+      }
+    }),
+  abortMultiPartUpload: publicProcedure
+    .input(
+      z.object({
+        uploadId: z.string(),
+        key: z.string(),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      console.info("Uploadjoy multipartUpload.abort API call");
+      const uj = ctx.uploadJoy;
+      try {
+        const response = await uj.multipartUpload.abort({
+          uploadId: input.uploadId,
+          key: input.key,
+        });
+        console.info("UploadJoy response: ", response);
+        return response;
+      } catch (e) {
+        console.error("Error calling UJ client: ", e);
+        return {};
+      } finally {
+        console.log("\n\n");
+        return {};
+      }
+    }),
 });

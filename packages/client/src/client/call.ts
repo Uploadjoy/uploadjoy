@@ -1,4 +1,4 @@
-import { OperationOptions } from "./types.js";
+import { HTTPError, OperationOptions } from "./types.js";
 import { OperationError } from "../error.js";
 
 const createAuthorizationHeader = (token: string) => {
@@ -17,7 +17,7 @@ export const callApi = async <TInput, TOutput>({
   url: string;
   options: OperationOptions;
   input: TInput;
-}): Promise<OperationError | TOutput> => {
+}): Promise<{ data?: TOutput; httpError?: HTTPError }> => {
   const authHeader = createAuthorizationHeader(token);
   const response = await fetch(url, {
     method,
@@ -31,8 +31,8 @@ export const callApi = async <TInput, TOutput>({
   if (response.status !== 200) {
     const error = new OperationError(response.status, await response.json());
     if (options.throwOnError) throw error;
-    return error;
+    return { httpError: error.toJSON() };
   }
   const body = await response.json();
-  return body as unknown as TOutput;
+  return { data: body as unknown as TOutput };
 };

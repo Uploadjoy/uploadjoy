@@ -10,9 +10,14 @@ const Home: NextPage = () => {
   });
   const { data: putObjectsData } = trpc.uploadjoy.putObjects.useQuery();
   const { data: mpUploadData } = trpc.uploadjoy.multiPartPresignUrl.useQuery();
-  console.log("uploadjoy.privateObject: ", data);
-  console.log("uploadjoy.putObjects: ", putObjectsData);
-  console.log("uploadjoy.multiPartPresignUrl: ", mpUploadData);
+  const abortMultiPartUpload = trpc.uploadjoy.abortMultiPartUpload.useQuery(
+    {
+      key: mpUploadData?.data ? mpUploadData.data.key : "",
+      uploadId: mpUploadData?.data ? mpUploadData.data.uploadId : "",
+    },
+    { enabled: mpUploadData?.data !== undefined },
+  );
+  console.log(abortMultiPartUpload.data);
   return (
     <>
       <main className={styles.main}>
