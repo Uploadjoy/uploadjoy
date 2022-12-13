@@ -118,7 +118,6 @@ export type MultipartUploadApiGroupConfig = {
     input: {
       uploadId: string;
       key: string;
-      visibility: Visibility;
       completedParts: {
         partNumber: number;
         eTag: string;
@@ -132,7 +131,6 @@ export type MultipartUploadApiGroupConfig = {
   abort: {
     input: {
       uploadId: string;
-      visibility: Visibility;
       key: string;
     };
     output: {
