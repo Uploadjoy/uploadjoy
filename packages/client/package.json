@@ -20,8 +20,8 @@
     "format:check": "prettier -c src/*.ts --ignore-path ../../.gitignore",
     "publish:dryrun": "pnpm build && npm publish --dry-run",
     "release": "changeset version",
-    "pub:beta": "pnpm build && npm publish --tag beta",
-    "pub:release": "pnpm build && npm publish"
+    "pub:beta": "pnpm build && npm publish --access public --tag beta",
+    "pub:release": "pnpm build && npm publish --access public"
   },
   "repository": {
     "type": "git",
