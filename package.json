@@ -22,7 +22,9 @@
     "format": "turbo format && prettier --write *.{cjs,md,json}",
     "format:check": "turbo format:check && prettier --check *.{cjs,md,json}",
     "check": "turbo lint typecheck format:check",
-    "clean": "turbo clean && rm -rf node_modules"
+    "clean": "turbo clean && rm -rf node_modules",
+    "pub:beta": "cd packages/client && pnpm pub:beta",
+    "pub:release": "cd packages/client && pnpm pub:release"
   },
   "engines": {
     "node": ">=14.0.0"
