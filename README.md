@@ -52,7 +52,7 @@ console.log(response.data);
         error?: string | undefined;
     }[];
   };
- * /
+ */
 ```
 
 **Example 2:** Abort a multipart upload.
