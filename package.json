@@ -9,23 +9,30 @@
   },
   "workspaces": [
     "packages/*",
-    "www/*"
+    "www/*",
+    "examples/*",
+    "e2e/*"
   ],
   "scripts": {
     "typecheck": "turbo typecheck",
     "build": "turbo build",
     "build:client": "turbo --filter=client build",
+    "dev:ct3": "turbo --filter=ct3 dev",
     "lint": "turbo lint",
     "format": "turbo format && prettier --write *.{cjs,md,json}",
     "format:check": "turbo format:check && prettier --check *.{cjs,md,json}",
     "check": "turbo lint typecheck format:check",
-    "clean": "turbo clean && rm -rf node_modules"
+    "clean": "turbo clean && rm -rf node_modules",
+    "pub:beta": "cd packages/client && pnpm pub:beta",
+    "pub:release": "cd packages/client && pnpm pub:release"
   },
   "engines": {
     "node": ">=14.0.0"
   },
   "packageManager": "pnpm@7.17.1",
   "dependencies": {
+    "@changesets/changelog-github": "^0.4.7",
+    "@changesets/cli": "^2.25.2",
     "@types/node": "^18.11.10",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",

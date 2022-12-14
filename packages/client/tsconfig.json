@@ -1,10 +1,14 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "target": "ES2016",
     "baseUrl": "./",
     "paths": {
       "~/*": ["./src/*"]
-    }
+    },
+    "outDir": "./dist",
+    "declaration": true,
+    "removeComments": false
   },
-  "include": ["src"]
+  "include": ["src/**/*.ts", ".eslintrc.cjs"]
 }

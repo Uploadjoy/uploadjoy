@@ -5,5 +5,6 @@ module.exports = {
     ecmaVersion: "latest", // Allows for the parsing of modern ECMAScript features
     sourceType: "module", // Allows for the use of import
     project: "./tsconfig.json", // Allows for the use of rules which require parserServices to be generated
+    tsconfigRootDir: __dirname,
   },
 };
