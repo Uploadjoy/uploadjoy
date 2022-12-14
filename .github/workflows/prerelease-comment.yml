@@ -45,7 +45,7 @@ jobs:
           message: |
             A Uploadjoy client prerelease is available for testing. You can install this latest build in your project with:
             ```sh
-            npm install @uploadjoy/client
+            npm install @uploadjoy/client@${{ env.BETA_PACKAGE_VERSION }}
             ```
       - name: "Remove the autorelease label once published"
         uses: actions/github-script@v6
