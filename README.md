@@ -1,5 +1,7 @@
 # Uploadjoy
 
+[Client and API documentation](https://docs.uploadjoy.com)
+
 [Uploadjoy](https://uploadjoy.com) is a storage service that hides the complexities of using
 S3 + Cloudfront while providing good defaults (server-side encryption at rest, cross-region replication, etc.) and
 a simple, type-safe API client for actions such as generating [presigned URLs](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html).

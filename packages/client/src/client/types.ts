@@ -14,7 +14,7 @@ export interface ClientOptions {
   apiToken: string;
   /**
    * Base URL for API
-   * @internal
+   * @internal - used for testing
    */
   _apiUrlBase?: string;
 }
