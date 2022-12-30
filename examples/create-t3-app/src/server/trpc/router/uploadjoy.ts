@@ -1,65 +1,72 @@
 import { z } from "zod";
 
 import { router, publicProcedure } from "../trpc";
+import { TRPCError } from "@trpc/server";
 
 export const uploadjoyRouter = router({
   downloadPrivateObject: publicProcedure
     .input(z.object({ keys: z.array(z.string()) }))
-    .query(async ({ input, ctx }) => {
-      console.info("Uploadjoy presignedUrl.downloadPrivateObjects API call");
+    .mutation(async ({ input, ctx }) => {
       const uj = ctx.uploadJoy;
       const { keys } = input;
-      try {
-        const response = await uj.presignedUrl.downloadPrivateObjects(
-          {
-            keys,
-            presignedUrlOptions: { expiresIn: 3600 },
-          },
-          { throwOnError: false },
-        );
-        console.info("UploadJoy response: ", response);
-      } catch (e) {
-        console.error("Error calling UJ client: ", e);
-        throw e;
-      }
-    }),
-  uploadObjects: publicProcedure.query(async ({ input, ctx }) => {
-    console.info("Uploadjoy presignedUrl.uploadObjects API call");
-    const uj = ctx.uploadJoy;
-    try {
-      const response = await uj.presignedUrl.uploadObjects(
-        {
-          objects: [
-            {
-              key: "new.jpg",
-              visibility: "private",
-            },
-          ],
-        },
-        { throwOnError: false },
-      );
-      console.info("UploadJoy response: ", response);
-    } catch (e) {
-      console.error("Error calling UJ client: ", e);
-      throw e;
-    }
-  }),
-  multipartUploadObject: publicProcedure.query(async ({ input, ctx }) => {
-    console.info("Uploadjoy presignedUrl.multipartUploadObject API call");
-    const uj = ctx.uploadJoy;
-    try {
-      const response = await uj.presignedUrl.multipartUploadObject({
-        key: "key.jpg",
-        filePartNames: ["1.jpg"],
-        visibility: "private",
+
+      // get presigned URLs for accessing objects located at the specified keys
+      const response = await uj.presignedUrl.downloadPrivateObjects({
+        keys,
       });
-      console.info("UploadJoy response: ", response);
+
+      if (response.httpError) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      }
+
       return response.data;
-    } catch (e) {
-      console.error("Error calling UJ client: ", e);
-      throw e;
-    }
-  }),
+    }),
+  uploadObjects: publicProcedure
+    .input(
+      z.object({
+        objects: z.array(
+          z.object({
+            key: z.string(),
+            visibility: z.enum(["private", "public"]),
+          }),
+        ),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { objects } = input;
+      const uj = ctx.uploadJoy;
+
+      // get presigned URLs for uploading objects at the specified keys and given visibility
+      const response = await uj.presignedUrl.uploadObjects({
+        objects,
+      });
+
+      if (response.httpError) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      }
+      return response.data;
+    }),
+  multipartUploadObject: publicProcedure
+    .input(
+      z.object({
+        key: z.string(),
+        filePartNames: z.array(z.string()),
+        visibility: z.enum(["private", "public"]),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const uj = ctx.uploadJoy;
+
+      // initiates a multipart upload and returns presigned URLs for uploading each of the provided file part names
+      const response = await uj.presignedUrl.multipartUploadObject({
+        ...input,
+      });
+
+      if (response.httpError) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      }
+      return response.data;
+    }),
   completeMultiPartUpload: publicProcedure
     .input(
       z.object({
@@ -74,22 +81,15 @@ export const uploadjoyRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      console.info("Uploadjoy multipartUpload.complete API call");
       const uj = ctx.uploadJoy;
-      try {
-        const response = await uj.multipartUpload.complete({
-          uploadId: input.uploadId,
-          key: input.key,
-          completedParts: input.completedParts,
-        });
-        console.info("UploadJoy response: ", response);
-        console.log("\n\n");
-        return response;
-      } catch (e) {
-        console.error("Error calling UJ client: ", e);
-        console.log("\n\n");
-        throw e;
+      const response = await uj.multipartUpload.complete({
+        ...input,
+      });
+
+      if (response.httpError) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
+      return response.data;
     }),
   abortMultiPartUpload: publicProcedure
     .input(
@@ -99,18 +99,14 @@ export const uploadjoyRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      console.info("Uploadjoy multipartUpload.abort API call");
       const uj = ctx.uploadJoy;
-      try {
-        const response = await uj.multipartUpload.abort({
-          uploadId: input.uploadId,
-          key: input.key,
-        });
-        console.info("UploadJoy response: ", response);
-        return response;
-      } catch (e) {
-        console.error("Error calling UJ client: ", e);
-        throw e;
+      const response = await uj.multipartUpload.abort({
+        ...input,
+      });
+
+      if (response.httpError) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
+      return response.data;
     }),
 });
