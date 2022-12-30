@@ -17,7 +17,7 @@
     "typecheck": "turbo typecheck",
     "build": "turbo build",
     "build:client": "turbo --filter=client build",
-    "dev:ct3": "turbo --filter=ct3 dev",
+    "dev:ct3": "turbo --filter=create-t3-app-example dev",
     "lint": "turbo lint",
     "format": "turbo format && prettier --write *.{cjs,md,json}",
     "format:check": "turbo format:check && prettier --check *.{cjs,md,json}",
