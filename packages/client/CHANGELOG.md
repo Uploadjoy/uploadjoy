@@ -1,5 +1,11 @@
 # @uploadjoy/client
 
+## 0.3.0
+
+### Minor Changes
+
+- [#7](https://github.com/Uploadjoy/uploadjoy/pull/7) [`157f638`](https://github.com/Uploadjoy/uploadjoy/commit/157f638d37a123bd338ab619b0c3c8fec875a43d) Thanks [@nramkissoon](https://github.com/nramkissoon)! - Refactor output types for some APIs
+
 ## 0.2.1
 
 ### Patch Changes
