@@ -1,11 +1,12 @@
 import { type NextPage } from "next";
-
-import { trpc } from "../utils/trpc";
+import { Dropzone } from "../components/Dropzone";
 
 const Home: NextPage = () => {
   return (
     <>
-      <main></main>
+      <main>
+        <Dropzone />
+      </main>
     </>
   );
 };

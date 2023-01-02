@@ -18,3 +18,10 @@ a {
 * {
   box-sizing: border-box;
 }
+
+@layer components {
+  .dropzone-container {
+    @apply flex h-[300px] w-[300px] flex-col items-center justify-between rounded-lg border text-center
+    border-zinc-300 bg-white p-[40px] py-8 align-middle text-zinc-400      shadow-inner;
+  }
+}

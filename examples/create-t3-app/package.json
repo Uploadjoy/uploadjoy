@@ -15,9 +15,11 @@
     "@trpc/react-query": "^10.0.0",
     "@trpc/server": "^10.0.0",
     "@uploadjoy/client": "*",
+    "axios": "^1.2.2",
     "next": "13.0.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-dropzone": "^14.2.3",
     "superjson": "1.9.1",
     "zod": "^3.18.0"
   },
