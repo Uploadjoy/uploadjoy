@@ -8,7 +8,6 @@ import { z } from "zod";
 export const serverSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]),
   // UPLOADJOY_TOKEN: z.string(),
-  // UPLOADJOY_SERVICE_BASE_URL: z.string(),
 });
 
 /**

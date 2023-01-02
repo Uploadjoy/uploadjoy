@@ -73,19 +73,13 @@ export type PresignedUrlApiGroupConfig = {
       }[];
     };
     output: {
-      presignedUrls: (
-        | {
-            key: string;
-            visibility: Visibility;
-            url: string;
-            fields: Record<string, string>;
-          }
-        | {
-            key: string;
-            visibility: Visibility;
-            error: string;
-          }
-      )[];
+      presignedUrls: {
+        key: string;
+        visibility: Visibility;
+        url?: string;
+        fields?: Record<string, string>;
+        error?: string;
+      }[];
     };
   };
   multipartUploadObject: {
@@ -102,13 +96,10 @@ export type PresignedUrlApiGroupConfig = {
       presignedUrls:
         | {
             filePartName: string;
-            url: string;
-            fields: Record<string, string>;
-            partNumber: number;
-          }
-        | {
-            filePartName: string;
-            error: string;
+            url?: string;
+            fields?: Record<string, string>;
+            partNumber?: number;
+            error?: string;
           }[];
     };
   };
