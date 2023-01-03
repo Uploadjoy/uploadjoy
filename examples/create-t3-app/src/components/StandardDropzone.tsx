@@ -1,13 +1,14 @@
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import axios from "axios";
 
 import { trpc } from "../utils/trpc";
 
-export const Dropzone = () => {
+export const StandardDropzone = () => {
   const [presignedUrl, setPresignedUrl] = useState<string | null>(null);
   const { mutateAsync: fetchPresignedUrls } =
     trpc.uploadjoy.uploadObjects.useMutation();
+  const [submitDisabled, setSubmitDisabled] = useState(true);
 
   const { getRootProps, getInputProps, isDragActive, acceptedFiles } =
     useDropzone({
@@ -29,6 +30,7 @@ export const Dropzone = () => {
 
           if (presignedUrlData?.url) {
             setPresignedUrl(presignedUrlData?.url);
+            setSubmitDisabled(false);
           }
         }
       },
@@ -47,35 +49,39 @@ export const Dropzone = () => {
         .put(presignedUrl, file.slice(), {
           headers: { "Content-Type": file.type },
         })
-        .then((response) => console.log(response))
+        .then((response) => {
+          console.log(response);
+          console.log("Successfully uploaded ", file.name);
+        })
         .catch((err) => console.error(err));
+      setSubmitDisabled(true);
     }
   }, [acceptedFiles, presignedUrl]);
 
   return (
-    <section className="p-10">
+    <section>
       <h2 className="text-lg font-semibold">Standard Dropzone</h2>
       <p className="mb-3">Simple example for uploading one file at a time</p>
       <div {...getRootProps()} className="dropzone-container">
         <input {...getInputProps()} />
         {isDragActive ? (
           <div className="flex h-full items-center justify-center font-semibold">
-            <p>Drop the files here...</p>
+            <p>Drop the file here...</p>
           </div>
         ) : (
           <div className="flex h-full items-center justify-center font-semibold">
-            <p>Drag n drop some files here, or click to select files</p>
+            <p>Drag n drop file here, or click to select files</p>
           </div>
         )}
       </div>
       <aside className="my-2">
-        <h4 className="text-zinc-500 font-semibold">Files pending upload</h4>
+        <h4 className="text-zinc-400 font-semibold">Files pending upload</h4>
         <ul>{files}</ul>
       </aside>
       <button
         onClick={() => handleSubmit()}
         disabled={presignedUrl === null || acceptedFiles.length === 0}
-        className="px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 disabled:opacity-70"
+        className="submit-button"
       >
         Upload
       </button>
