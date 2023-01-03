@@ -16,6 +16,7 @@ export const uploadjoyRouter = router({
       });
 
       if (response.httpError) {
+        console.log(response.httpError);
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
 
@@ -42,6 +43,7 @@ export const uploadjoyRouter = router({
       });
 
       if (response.httpError) {
+        console.log(response.httpError);
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
       return response.data;
@@ -63,6 +65,7 @@ export const uploadjoyRouter = router({
       });
 
       if (response.httpError) {
+        console.log(response.httpError);
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
       return response.data;
@@ -87,6 +90,7 @@ export const uploadjoyRouter = router({
       });
 
       if (response.httpError) {
+        console.log(response.httpError);
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
       return response.data;
@@ -105,6 +109,7 @@ export const uploadjoyRouter = router({
       });
 
       if (response.httpError) {
+        console.log(response.httpError);
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
       return response.data;

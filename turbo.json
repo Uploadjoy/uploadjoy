@@ -2,7 +2,7 @@
   "pipeline": {
     "clean": {},
     "build": {
-      "outputs": ["dist/**"],
+      "outputs": ["dist/**", ".next/**"],
       "dependsOn": ["^build"]
     },
     "start": {
