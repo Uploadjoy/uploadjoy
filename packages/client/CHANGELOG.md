@@ -1,5 +1,11 @@
 # @uploadjoy/client
 
+## 0.4.0
+
+### Minor Changes
+
+- [#10](https://github.com/Uploadjoy/uploadjoy/pull/10) [`7ec945f`](https://github.com/Uploadjoy/uploadjoy/commit/7ec945f67460facae0a0584ee5a00cc9b1d55960) Thanks [@nramkissoon](https://github.com/nramkissoon)! - add www to url
+
 ## 0.3.0
 
 ### Minor Changes
