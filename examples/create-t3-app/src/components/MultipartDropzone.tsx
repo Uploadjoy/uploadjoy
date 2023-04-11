@@ -13,7 +13,7 @@ const calculateChunkSize = (fileSize: number) => {
   } else if (fileSize <= FiveHundredGB) {
     return 50 * 2 ** 20; // 50MB
   } else if (fileSize <= FiveTB) {
-    return 500 * 2 ** 20; // 500MB
+    return Math.ceil(FiveTB / 10000); // use the full 10k allowed parts
   }
 
   return 500 * 2 ** 20; // 500MB
@@ -41,6 +41,7 @@ const splitFileIntoParts = (file: File) => {
 };
 
 export const MultipartDropzone = () => {
+  // presigned URLs for uploading each file part
   const [partPresignedUrls, setPartPresignedUrls] = useState<
     { partName: string; url: string; partNumber: number }[]
   >([]);
@@ -57,7 +58,7 @@ export const MultipartDropzone = () => {
     useDropzone({
       maxFiles: 1,
       maxSize: 5 * 2 ** 40, // roughly 5TB
-      minSize: 1 * 2 ** 20, // 1MB
+      minSize: 1 * 2 ** 20, // 1MB -> S3 limitation
       multiple: false,
       onDropAccepted: async (files, event) => {
         const file = files[0] as File;
@@ -104,7 +105,7 @@ export const MultipartDropzone = () => {
               },
             })
             .then((response) => ({
-              eTag: response.headers.etag as string,
+              eTag: response.headers.etag as string, // Entity tag for the uploaded object
               partNumber: partNumber,
             })),
         );

@@ -1,4 +1,4 @@
-export const API_BASE = "https://uploadjoy.com/api/v1";
+export const API_BASE = "https://www.uploadjoy.com/api/v1";
 
 export const ENDPOINTS = {
   presignedUrl: {
