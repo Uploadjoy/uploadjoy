@@ -1,0 +1,23 @@
+{
+  "name": "@uploadjoy/uploader-common",
+  "version": "0.0.2",
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint *.ts*",
+    "build": "tsup"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "zod": "^3.21.4",
+    "zod-validation-error": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.17",
+    "@types/react-dom": "^18.0.6",
+    "eslint": "^7.32.0",
+    "eslint-config-custom": "workspace:*",
+    "react": "^18.2.0",
+    "tsup": "6.7.0",
+    "typescript": "^4.5.2"
+  }
+}
