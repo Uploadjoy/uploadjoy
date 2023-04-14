@@ -151,3 +151,15 @@ export const apiCallArgsSchema = z.object({
 });
 
 export type ApiCallArgs = z.infer<typeof apiCallArgsSchema>;
+
+export const onUploadEventServerCallbackParamSchema = z.object({
+  fileName: z.string(),
+  fileSize: z.number(),
+  fileType: z.string(),
+  location: z.string(),
+  fileAccess: z.union([z.literal("public"), z.literal("private")]),
+});
+
+export type OnUploadEventServerCallbackParam = z.infer<
+  typeof onUploadEventServerCallbackParamSchema
+>;

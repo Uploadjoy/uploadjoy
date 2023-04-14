@@ -1,4 +1,7 @@
-import type { GetPresignedUrlOpts } from "@uploadjoy/uploader-common";
+import type {
+  GetPresignedUrlOpts,
+  OnUploadEventServerCallbackParam,
+} from "@uploadjoy/uploader-common";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export type NextRouteHandler = (
@@ -29,7 +32,11 @@ export type Options = {
         message?: string;
       }
   >;
-  onUploadSuccess?: () => void;
-  onUploadError?: () => void;
+  callbacks?: {
+    onUploadSuccess?: (
+      params: OnUploadEventServerCallbackParam,
+    ) => Promise<void>;
+    onUploadError?: (params: OnUploadEventServerCallbackParam) => Promise<void>;
+  };
   customApiUrl?: string;
 };

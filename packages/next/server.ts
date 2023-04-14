@@ -1,16 +1,22 @@
-import type { FetchPresignedUrlsError } from "@uploadjoy/uploader-common";
 import {
-  fetchPresignedUrlsFromExternalApi,
-  getPresignedUrlOpts,
-} from "@uploadjoy/uploader-common";
+  getPresignedUrlsForUpload,
+  onUploadError,
+  onUploadSuccess,
+} from "src/server/actions";
 import { Handler, NextRouteHandler, Options } from "src/server/types";
 
 // actions map to the API endpoints in Next.js
-const actions = ["presignedUrls/upload"];
+const actions = [
+  "presignedUrls/upload",
+  "upload/success",
+  "upload/error",
+] as const;
 
 const actionIsValid = (action: string | string[] | undefined): boolean => {
   return (
-    !action || typeof action === "string" || !actions.includes(action.join("/"))
+    !action ||
+    typeof action === "string" ||
+    !actions.includes(action.join("/") as any)
   );
 };
 
@@ -24,61 +30,12 @@ const makeRouteHandler = (options: Options): Handler => {
       });
     }
 
-    const {
-      apiKey,
-      canUpload,
-      customApiUrl = "https://www.uploadjoy.com/api/v2",
-    } = options;
-
-    const inputValidation = getPresignedUrlOpts.safeParse(req.body);
-
-    if (!inputValidation.success) {
-      return res.status(400).json({
-        message: "Invalid input",
-        errors: inputValidation.error.issues,
-      });
-    }
-
-    const { fileAccess, files, folder } = inputValidation.data;
-
-    if (canUpload) {
-      const canUploadResult = await canUpload(
-        { fileAccess, files, folder },
-        req,
-        res,
-      );
-      if (!canUploadResult.canUpload) {
-        return res.status(403).json({
-          message:
-            canUploadResult.message ?? "You are not allowed to upload files",
-        });
-      }
-    }
-
-    const filesWithKey = files.map((file) => ({
-      size: file.size,
-      type: file.type,
-      // folder and file name are validated above
-      key: `${folder ?? ""}${file.name}`,
-    }));
-
-    try {
-      const presignedUrls = await fetchPresignedUrlsFromExternalApi({
-        token: apiKey,
-        input: {
-          files: filesWithKey,
-          fileAccess,
-        },
-        customApiUrl: customApiUrl,
-      });
-
-      res.status(200).json(presignedUrls);
-    } catch (error) {
-      const asFetchError = error as FetchPresignedUrlsError;
-      res.status(500).json({
-        message: "Error fetching presigned URLs",
-        errorFromUploadjoy: asFetchError.responseBody(),
-      });
+    if (action === "presignedUrls/upload") {
+      await getPresignedUrlsForUpload({ req, res, options });
+    } else if (action === "upload/success") {
+      await onUploadSuccess({ req, res, options });
+    } else if (action === "upload/error") {
+      await onUploadError({ req, res, options });
     }
   };
 
