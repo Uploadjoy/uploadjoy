@@ -67,9 +67,7 @@ export const fetchPresignedUrlsFromExternalApi = async ({
     externalApiPutObjectApiOutputSchema.safeParse(data);
   if (!responseParseResult.success) {
     // This should never happen, but if it does, we want to know about it
-    console.error(
-      "Failed to parse response from Uploadjoy API. This is a bug.",
-    );
+    console.error("Failed to parse response from API. This is a bug.");
     console.error(responseParseResult.error.issues);
     throw new FetchPresignedUrlsError(
       "Failed to fetch presigned URLs",

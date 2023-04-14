@@ -34,8 +34,11 @@ jobs:
       - name: Check for errors
         run: pnpm check
 
-      - name: Build the package
+      - name: Build the client package
         run: pnpm build:client
+
+      - name: Build the next package
+        run: pnpm build:next
 
       - name: Create Version PR or Publish to NPM
         id: changesets

@@ -14,7 +14,7 @@ export const fileNameSchema = z.string().regex(fileNameRegex, {
 });
 
 export const validateFolder = (
-  folder: string | undefined
+  folder: string | undefined,
 ): { success: true } | { success: false; errorMessage: string } => {
   if (folder) {
     const result = folderNameSchema.safeParse(folder);
@@ -31,7 +31,7 @@ export const validateFolder = (
 };
 
 const validateFolderAsync = async (
-  folder: string | undefined
+  folder: string | undefined,
 ): Promise<{ success: true } | { success: false; errors: z.ZodIssue[] }> => {
   if (folder) {
     const result = await folderNameSchema.safeParseAsync(folder);
@@ -47,7 +47,7 @@ const validateFolderAsync = async (
 };
 
 export const validateFilename = (
-  filename: string
+  filename: string,
 ): { success: true } | { success: false; errorMessage: string } => {
   const result = fileNameSchema.safeParse(filename);
   if (!result.success) {
@@ -62,7 +62,7 @@ export const validateFilename = (
 };
 
 const validateFilenamesAsync = async (
-  files: { name: string; size: number; type: string }[]
+  files: { name: string; size: number; type: string }[],
 ): Promise<{ success: true } | { success: false; errors: z.ZodIssue[] }> => {
   const filenames = files.map((file) => file.name);
   const result = await fileNameSchema.array().safeParseAsync(filenames);
@@ -78,13 +78,13 @@ const validateFilenamesAsync = async (
 
 export const validateFileNamesAndFolderAsync = async (
   files: { name: string; size: number; type: string }[],
-  folder: string | undefined
+  folder: string | undefined,
 ): Promise<{ success: true } | { success: false; errors: z.ZodIssue[] }> => {
   const folderValidation = validateFolderAsync(folder);
   const filenamesValidation = validateFilenamesAsync(files);
 
   const [folderValidationResult, filenamesValidationResult] = await Promise.all(
-    [folderValidation, filenamesValidation]
+    [folderValidation, filenamesValidation],
   );
 
   if (!folderValidationResult.success && !filenamesValidationResult.success) {
@@ -113,21 +113,21 @@ export const externalApiPutObjectApiOutputSchema = z.record(
   z.object({
     url: z.string(),
     location: z.string(),
-  })
+  }),
 );
 
 export type ExternalApiPutObjectApiOutput = z.infer<
   typeof externalApiPutObjectApiOutputSchema
 >;
 
-const getPresignedUrlOpts = z.object({
+export const getPresignedUrlOpts = z.object({
   folder: folderNameSchema,
   files: z.array(
     z.object({
       name: fileNameSchema,
       size: z.number(),
       type: z.string(),
-    })
+    }),
   ),
   fileAccess: z.union([z.literal("public"), z.literal("private")]),
   apiUrl: z.string(),
@@ -144,7 +144,7 @@ export const apiCallArgsSchema = z.object({
         key: z.string(),
         size: z.number(),
         type: z.string(),
-      })
+      }),
     ),
     fileAccess: z.union([z.literal("public"), z.literal("private")]),
   }),
