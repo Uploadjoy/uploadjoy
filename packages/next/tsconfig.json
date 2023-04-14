@@ -18,5 +18,6 @@
     "baseUrl": ".",
     "lib": ["ESNext", "DOM"]
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "include": ["./**/*.ts", ".eslintrc.cjs"]
 }
