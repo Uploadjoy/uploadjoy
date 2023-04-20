@@ -1,5 +1,11 @@
 # @uploadjoy/uploader-common
 
+## 0.2.0
+
+### Minor Changes
+
+- [#14](https://github.com/Uploadjoy/uploadjoy/pull/14) [`deda411`](https://github.com/Uploadjoy/uploadjoy/commit/deda41134e94761d495af3ef21e607cdbae078a0) Thanks [@nramkissoon](https://github.com/nramkissoon)! - Refactors
+
 ## 0.1.0
 
 ### Minor Changes
