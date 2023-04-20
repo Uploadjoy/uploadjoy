@@ -130,7 +130,6 @@ export const getPresignedUrlOpts = z.object({
     }),
   ),
   fileAccess: z.union([z.literal("public"), z.literal("private")]),
-  apiUrl: z.string(),
 });
 
 export type GetPresignedUrlOpts = z.infer<typeof getPresignedUrlOpts>;
@@ -152,7 +151,7 @@ export const apiCallArgsSchema = z.object({
 
 export type ApiCallArgs = z.infer<typeof apiCallArgsSchema>;
 
-export const onUploadEventServerCallbackParamSchema = z.object({
+export const onUploadWebhookParamSchema = z.object({
   fileName: z.string(),
   fileSize: z.number(),
   fileType: z.string(),
@@ -160,6 +159,4 @@ export const onUploadEventServerCallbackParamSchema = z.object({
   fileAccess: z.union([z.literal("public"), z.literal("private")]),
 });
 
-export type OnUploadEventServerCallbackParam = z.infer<
-  typeof onUploadEventServerCallbackParamSchema
->;
+export type OnUploadWebhookParam = z.infer<typeof onUploadWebhookParamSchema>;

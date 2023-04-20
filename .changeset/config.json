@@ -10,5 +10,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["create-t3-app-example"]
+  "ignore": ["create-t3-app"]
 }

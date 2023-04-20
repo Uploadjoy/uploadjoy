@@ -1,22 +1,14 @@
-import {
-  getPresignedUrlsForUpload,
-  onUploadError,
-  onUploadSuccess,
-} from "src/server/actions";
-import { Handler, NextRouteHandler, Options } from "src/server/types";
+import { getPresignedUrlsForUpload } from "./src/server/actions";
+import type { Handler, NextRouteHandler, Options } from "./src/server/types";
 
 // actions map to the API endpoints in Next.js
-const actions = [
-  "presignedUrls/upload",
-  "upload/success",
-  "upload/error",
-] as const;
+const actions = ["presignedUrls/upload"] as const;
 
 const actionIsValid = (action: string | string[] | undefined): boolean => {
   return (
-    !action ||
-    typeof action === "string" ||
-    !actions.includes(action.join("/") as any)
+    action !== undefined &&
+    typeof action !== "string" &&
+    actions.includes(action.join("/") as any)
   );
 };
 
@@ -30,12 +22,10 @@ const makeRouteHandler = (options: Options): Handler => {
       });
     }
 
-    if (action === "presignedUrls/upload") {
+    const actionString = (action as string[]).join("/");
+
+    if (actionString === "presignedUrls/upload") {
       await getPresignedUrlsForUpload({ req, res, options });
-    } else if (action === "upload/success") {
-      await onUploadSuccess({ req, res, options });
-    } else if (action === "upload/error") {
-      await onUploadError({ req, res, options });
     }
   };
 

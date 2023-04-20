@@ -4,7 +4,6 @@ import {
   getPresignedUrlOpts,
   fetchPresignedUrlsFromExternalApi,
   FetchPresignedUrlsError,
-  onUploadEventServerCallbackParamSchema,
 } from "@uploadjoy/uploader-common";
 
 export const getPresignedUrlsForUpload = async ({
@@ -66,81 +65,10 @@ export const getPresignedUrlsForUpload = async ({
     return res.status(200).json(presignedUrls);
   } catch (error) {
     const asFetchError = error as FetchPresignedUrlsError;
+    console.log(error);
     return res.status(500).json({
       message: "Error fetching presigned URLs",
       errorFromUploadjoy: asFetchError.responseBody(),
     });
   }
-};
-
-export const onUploadSuccess = async ({
-  req,
-  res,
-  options,
-}: {
-  req: NextApiRequest;
-  res: NextApiResponse;
-  options: Options;
-}) => {
-  const { callbacks } = options;
-
-  if (callbacks?.onUploadSuccess) {
-    const inputValidation = onUploadEventServerCallbackParamSchema.safeParse(
-      req.body,
-    );
-
-    if (!inputValidation.success) {
-      return res.status(400).json({
-        message: "Invalid input",
-        errors: inputValidation.error.issues,
-      });
-    }
-
-    try {
-      await callbacks.onUploadSuccess(inputValidation.data);
-      return res.status(200);
-    } catch (error) {
-      return res.status(500).json({
-        message: "Error executing onUploadSuccess callback",
-      });
-    }
-  }
-
-  return res.status(200);
-};
-
-export const onUploadError = async ({
-  req,
-  res,
-  options,
-}: {
-  req: NextApiRequest;
-  res: NextApiResponse;
-  options: Options;
-}) => {
-  const { callbacks } = options;
-
-  if (callbacks?.onUploadError) {
-    const inputValidation = onUploadEventServerCallbackParamSchema.safeParse(
-      req.body,
-    );
-
-    if (!inputValidation.success) {
-      return res.status(400).json({
-        message: "Invalid input",
-        errors: inputValidation.error.issues,
-      });
-    }
-
-    try {
-      await callbacks.onUploadError(inputValidation.data);
-      return res.status(200);
-    } catch (error) {
-      return res.status(500).json({
-        message: "Error executing onUploadError callback",
-      });
-    }
-  }
-
-  return res.status(200);
 };

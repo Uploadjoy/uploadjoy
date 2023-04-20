@@ -18,7 +18,7 @@
     "build": "turbo build",
     "build:client": "turbo --filter=client build",
     "build:next": "turbo --filter=next build",
-    "dev:ct3": "turbo --filter=create-t3-app-example dev",
+    "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "turbo format && prettier --write *.{cjs,md,json}",
     "format:check": "turbo format:check && prettier --check *.{cjs,md,json}",
