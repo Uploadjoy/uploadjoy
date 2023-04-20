@@ -2,8 +2,8 @@ import { Uploadjoy } from "@uploadjoy/next/server";
 import { env } from "~/env.mjs";
 
 export default Uploadjoy({
-  apiKey: env.UPLOADJOY_API_KEY,
-  customApiUrl: env.UPLOADJOY_API_URL,
+  apiKey: "apiKey",
+  customApiUrl: "http://localhost:3000/api/v2",
 
   canUpload: (ctx, req, res) => {
     if (ctx.fileAccess === "public") {
