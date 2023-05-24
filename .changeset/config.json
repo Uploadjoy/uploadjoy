@@ -11,8 +11,5 @@
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": [
-    "@example/appdir",
-    "@example/pagedir",
-    "docs"
   ]
 }
