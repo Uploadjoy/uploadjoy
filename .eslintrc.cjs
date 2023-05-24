@@ -16,12 +16,14 @@ module.exports = {
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/ban-types": "warn",
     "unicorn/filename-case": [
       "error",
       {
         cases: {
           camelCase: true,
           pascalCase: true,
+          kebabCase: true,
         },
       },
     ],

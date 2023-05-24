@@ -5,10 +5,14 @@
     { "repo": "Uploadjoy/uploadjoy" }
   ],
   "commit": false,
-  "fixed": [],
+  "fixed": [["uploadjoy", "@uploadjoy/react", "@uploadjoy/api-client"]],
   "linked": [],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["create-t3-app"]
+  "ignore": [
+    "@example/appdir",
+    "@example/pagedir",
+    "docs"
+  ]
 }

@@ -1,5 +1,5 @@
 {
-  "name": "@uploadjoy/root",
+  "name": "@uploadjoy/turbo",
   "version": "0.0.0",
   "type": "module",
   "license": "MIT",
@@ -16,15 +16,14 @@
   "scripts": {
     "typecheck": "turbo typecheck",
     "build": "turbo build",
-    "build:client": "turbo --filter=client build",
-    "build:next": "turbo --filter=next build",
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "turbo format && prettier --write *.{cjs,md,json}",
     "format:check": "turbo format:check && prettier --check *.{cjs,md,json}",
     "check": "turbo lint typecheck format:check",
     "clean": "turbo clean && rm -rf node_modules pnpm-lock.yaml",
-    "pub:release": "cd packages/client && pnpm pub:release"
+    "pub:release": "cd packages/client && pnpm pub:release",
+    "test": "turbo run test"
   },
   "engines": {
     "node": ">=14.0.0"

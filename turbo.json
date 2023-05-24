@@ -18,6 +18,7 @@
     "dev": {
       "cache": false
     },
-    "typecheck": {}
+    "typecheck": {},
+    "test": {}
   }
 }

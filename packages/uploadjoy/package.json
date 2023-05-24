@@ -1,0 +1,60 @@
+{
+  "name": "uploadjoy",
+  "version": "0.5.0",
+  "license": "MIT",
+  "exports": {
+    "./package.json": "./package.json",
+    "./client": {
+      "import": "./dist/client.mjs",
+      "types": "./dist/client.d.ts"
+    },
+    "./server": {
+      "import": "./dist/server.mjs",
+      "types": "./dist/server.d.ts",
+      "default": "./dist/server.mjs"
+    },
+    "./next": {
+      "import": "./dist/next.mjs",
+      "types": "./dist/next.d.ts"
+    },
+    "./next-legacy": {
+      "import": "./dist/next-legacy.mjs",
+      "types": "./dist/next-legacy.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
+    }
+  },
+  "scripts": {
+    "lint": "eslint *.ts* --max-warnings 0",
+    "build": "tsup",
+    "prebuild": "tsup",
+    "clean": "git clean -xdf dist node_modules",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^3.21.4"
+  },
+  "devDependencies": {
+    "@types/node": "18.16.0",
+    "eslint-config-custom": "workspace:*",
+    "eslint": "^8.40.0",
+    "next": "13.4.1",
+    "tsup": "6.7.0",
+    "typescript": "5.1.0-beta",
+    "vitest": "^0.30.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
