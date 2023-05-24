@@ -3,7 +3,6 @@ import { exec } from "child_process";
 
 const pkgJsonPaths = [
   "packages/uploadjoy/package.json",
-  "packages/next/package.json",
   "packages/react/package.json",
   "packages/api-client/package.json",
 ];
