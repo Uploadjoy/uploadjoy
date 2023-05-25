@@ -1,5 +1,5 @@
 import type { DragEvent, SyntheticEvent } from "react";
-import { validateFilename } from "uploadjoy/validators";
+import { validateFilename } from "@uploadjoy/core/validators";
 
 type FilenameExtension = `.${string}`;
 type MimeTypes =
