@@ -1,0 +1,53 @@
+{
+  "name": "@uploadjoy/api-client",
+  "version": "0.5.0",
+  "description": "Uploadjoy client",
+  "author": "Uploadjoy",
+  "license": "MIT",
+  "exports": {
+    "./package.json": "./package.json",
+    "./index": {
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsup",
+    "prebuild": "tsup",
+    "prepare": "pnpm build",
+    "clean": "git clean -xdf dist node_modules",
+    "lint": "eslint *.ts* --max-warnings 0",
+    "dev": "tsup --watch",
+    "format": "prettier --write src/*.ts --ignore-path ../../.gitignore",
+    "format:check": "prettier -c src/*.ts --ignore-path ../../.gitignore"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Uploadjoy/uploadjoy.git",
+    "directory": "packages/client"
+  },
+  "bugs": {
+    "url": "https://github.com/Uploadjoy/uploadjoy/issues"
+  },
+  "homepage": "https://github.com/Uploadjoy/uploadjoy#readme",
+  "devDependencies": {
+    "@types/node": "^18.11.10",
+    "tsup": "6.7.0",
+    "typescript": "^4.9.3",
+    "vitest": "^0.30.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
