@@ -1,5 +1,7 @@
 # @uploadjoy/client
 
+## 1.0.0
+
 ## 0.5.0
 
 ### Minor Changes
