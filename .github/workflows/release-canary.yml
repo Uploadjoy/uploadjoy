@@ -49,11 +49,11 @@ jobs:
 
       - name: Authenticate to npm and publish
         run: |
-          pnpm build --filter @uploadjoy/react --filter uploadjoy --filter uploadjoy --filter @uploadjoy/api-client
+          pnpm build --filter @uploadjoy/react --filter uploadjoy --filter @uploadjoy/core --filter @uploadjoy/api-client
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
           pnpm publish packages/api-client --access public --tag canary --no-git-checks
           pnpm publish packages/react --access public --tag canary --no-git-checks
-          pnpm publish packages/uploadjoy --access public --tag canary --no-git-checks
+          pnpm publish packages/core --access public --tag canary --no-git-checks
 
       - name: Create a new comment notifying of the new canary version
         uses: actions/github-script@v6
@@ -73,13 +73,13 @@ jobs:
               body: `A new canary is available for testing. You can install this latest build in your project with:
 
               \`\`\`sh
-              pnpm add uploadjoy@${version}
+              pnpm add @uploadjoy/core@${version}
               \`\`\`
 
               or, if you're using React:
 
               \`\`\`sh
-              pnpm add uploadjoy@${version} @uploadjoy/react@${version}
+              pnpm add @uploadjoy/core@${version} @uploadjoy/react@${version}
               \`\`\`
               `,
             })

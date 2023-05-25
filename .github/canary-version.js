@@ -2,7 +2,7 @@ import fs from "fs";
 import { exec } from "child_process";
 
 const pkgJsonPaths = [
-  "packages/uploadjoy/package.json",
+  "packages/core/package.json",
   "packages/react/package.json",
   "packages/api-client/package.json",
 ];
@@ -28,10 +28,6 @@ try {
           new RegExp(`"@uploadjoy/\\*": "${oldVersion}"`, "g"),
           `"@uploadjoy/*": "${newVersion}"`
         )
-        .replace(
-          new RegExp(`"uploadjoy": "${oldVersion}"`, "g"),
-          `"uploadjoy": "${newVersion}"`
-        );
 
       fs.writeFileSync(pkgJsonPath, newContent);
     }

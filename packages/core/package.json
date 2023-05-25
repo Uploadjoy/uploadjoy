@@ -1,5 +1,5 @@
 {
-  "name": "uploadjoy",
+  "name": "@uploadjoy/core",
   "version": "0.5.0",
   "license": "MIT",
   "exports": {
