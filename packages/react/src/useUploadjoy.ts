@@ -1,4 +1,4 @@
-import type { FileRouter } from "uploadjoy/server";
+import type { FileRouter } from "@uploadjoy/core/server";
 import { useInput } from "./useInput";
 
 export const generateReactHelpers = <TRouter extends FileRouter>() => {

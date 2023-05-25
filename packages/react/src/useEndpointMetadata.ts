@@ -1,5 +1,5 @@
 import useFetch from "./useFetch";
-import type { AllowedFiles } from "uploadjoy/client";
+import type { AllowedFiles } from "@uploadjoy/core/client";
 
 type EndpointMetadata = {
   slug: string;

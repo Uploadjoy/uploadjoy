@@ -1,5 +1,4 @@
 import type { DragEvent, SyntheticEvent } from "react";
-import { validateFilename } from "uploadjoy/validators";
 
 type FilenameExtension = `.${string}`;
 type MimeTypes =
@@ -132,76 +131,6 @@ export const fileSizeIsAcceptable = (
   }
 
   return true;
-};
-
-export const validateFile = (
-  file: File,
-  accept: AcceptAttr | undefined,
-  acceptAll: boolean,
-  minSize: number | undefined,
-  maxSize: number | undefined,
-  customValidator: FileValidator | undefined,
-) => {
-  const result: {
-    file: File;
-    errors: { code: string; message: string }[];
-  } = { file, errors: [] };
-
-  if (customValidator) {
-    const customValidatorError = customValidator(file);
-    if (customValidatorError) {
-      result.errors.push(customValidatorError);
-    }
-  }
-
-  const fileNameParseResult = validateFilename(file.name);
-
-  if (!fileNameParseResult.success) {
-    result.errors.push({
-      code: "file-name-invalid",
-      message: fileNameParseResult.errorMessage,
-    });
-  }
-
-  if (!fileTypeIsAcceptable(accept, file, acceptAll)) {
-    result.errors.push(getInvalidFileTypeRejectionError(accept as any));
-  }
-
-  const fileSizeIsAcceptableResult = fileSizeIsAcceptable(
-    file,
-    minSize,
-    maxSize,
-  );
-
-  if (fileSizeIsAcceptableResult !== true) {
-    result.errors.push(fileSizeIsAcceptableResult);
-  }
-
-  return result;
-};
-
-export const allFilesAreAcceptable = (
-  files: File[],
-  accept: AcceptAttr,
-  acceptAll: boolean,
-  minSize: number | undefined,
-  maxSize: number | undefined,
-  customValidator: FileValidator | undefined,
-  maxFiles = 1,
-  multiple: boolean,
-) => {
-  if (
-    (!multiple && files.length > 1) ||
-    (multiple && maxFiles >= 1 && files.length > maxFiles)
-  ) {
-    return false;
-  }
-
-  return files.every(
-    (file) =>
-      validateFile(file, accept, acceptAll, minSize, maxSize, customValidator)
-        .errors.length === 0,
-  );
 };
 
 // React's synthetic events has event.isPropagationStopped,

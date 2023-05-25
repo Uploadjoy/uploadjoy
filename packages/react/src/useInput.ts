@@ -25,8 +25,8 @@ import type {
   ClientOnUploadCallback,
   ClientOnUploadFailureCallback,
   ClientOnUploadProgressCallback,
-} from "uploadjoy/client";
-import { fetchPresignedUrls, uploadFiles } from "uploadjoy/client";
+} from "@uploadjoy/core/client";
+import { fetchPresignedUrls, uploadFiles } from "@uploadjoy/core/client";
 import { useEndpointMetadata } from "./useEndpointMetadata";
 
 type UseInputOptions<T extends string> = {
