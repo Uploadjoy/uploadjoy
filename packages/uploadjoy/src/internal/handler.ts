@@ -111,7 +111,7 @@ const conditionalDevServer = async (requestId: string, upSecret: string) => {
         metadata: JSON.parse(file.metadata ?? "{}"),
         file: {
           // TODO: change this URL
-          url: ``,
+          url: file.url,
           key: file.key,
           name: file.name,
           access: file.access,
