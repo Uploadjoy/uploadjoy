@@ -1,0 +1,127 @@
+export const description =
+  "This guide will teach you how to integrate Uploadjoy's uploader component and API into your Next.js application.";
+
+<Note>
+  `@uploadjoy/next` is built to work with Next.js's `pages` directory. We are
+  currently working on building a package for the new beta `app` directory.
+</Note>
+
+# Uploadjoy for Next.js
+
+This section of the documentation will teach you how to integrate Uploadjoy's uploader component and API into your Next.js application.
+
+## Installation
+
+`@uploadjoy/next` is available as an [npm package](https://www.npmjs.com/package/@uploadjoy/next). It contains a React uploader component and a server-side API for fetching presigned URLs for uploads.
+
+```bash
+npm install @uploadjoy/next --save
+```
+
+## Quick Start
+
+With `@uploadjoy/next` installed, you can implement a file uploads into your Next.js application.
+
+### Add API Route
+
+To add Uploadjoy to a Next.js application, you need to create an API route that fetches presigned URLs for uploads.
+
+Create a new file called `[...actions].ts` in the `pages/api/uploadjoy` folder of your Next.js application. This contains the dynamic route handler for Uploadjoy which will also contain all of your server-side configurations.
+
+```ts
+import { Uploadjoy } from "@uploadjoy/next/server";
+
+export default Uploadjoy({
+  apiKey: "apiKey",
+
+  canUpload: (ctx, req, res) => {
+    if (ctx.fileAccess === "public") {
+      return {
+        canUpload: false,
+        message: "Public uploads are not allowed",
+      };
+    }
+
+    return {
+      canUpload: true,
+    };
+  },
+});
+```
+
+### Add Uploader Component
+
+In your Next.js application, create a React component that uses the `useInput` hook to create a file input element and upload files.
+
+```tsx
+import { type NextPage } from "next";
+import { useInput } from "@uploadjoy/next/client";
+
+const Home: NextPage = () => {
+  const { uploadFiles, openFileDialog, getInputProps, presignedUrls } =
+    useInput({
+      folder: "my-folder/",
+      fileAccess: "private",
+      clientCallbacks: {
+        onUploadProgress(ctx) {
+          console.log(
+            ctx.fileName,
+            "progress:",
+            ctx.uploadProgress.loaded,
+            "bytes"
+          );
+        },
+        onUploadSuccess(ctx) {
+          console.log(ctx.fileName, "uploaded");
+        },
+        onUploadError(ctx) {
+          console.log(ctx.fileName, "upload error");
+        },
+      },
+    });
+
+  // console log the presigned URLs when they are fetched
+  console.log(presignedUrls);
+
+  return (
+    <>
+      {/* hidden file input element */}
+      <input {...getInputProps()} />
+      <button onClick={openFileDialog}>Open</button>
+      <button
+        onClick={async () => {
+          await uploadFiles();
+        }}
+      >
+        Submit
+      </button>
+    </>
+  );
+};
+
+export default Home;
+```
+
+`useInput` is a React hook that creates props for a hidden file input element and provides methods for opening the file dialog and uploading files. It also calls the API route you created in the previous section to fetch presigned URLs for uploads whenever a file is selected.
+
+## What's Next?
+
+<div className="not-prose mb-16 mt-6 flex gap-3">
+  <Button
+    href="/nextjs/setup"
+    arrow="right"
+    children="@uploadjoy/next/client API"
+  />
+  <Button
+    href="/client/setup"
+    arrow="right"
+    children="@uploadjoy/next/server API"
+  />
+  <Button
+    href="https://github.com/Uploadjoy/uploadjoy/tree/main/examples/create-t3-app"
+    variant="outline"
+    target="_blank"
+    rel="noopener noreferrer"
+    children="create-t3-app example"
+  />
+</div>

@@ -1,0 +1,130 @@
+export const description =
+  "On this page, we’ll dive into the different multipart upload endpoints you can use.";
+
+# Multipart uploads
+
+Multipart uploads allow you to upload a single file as a series of parts independently from one another. Uploading different parts of the file can be parallelized, making multipart uploads efficient for uploading larger objects. You can read about multipart uploads in detail in the [S3 documentation](https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html).{{ className: 'lead' }}
+
+The Uploadjoy API provides a number of endpoints that allow you to interact with multipart uploads.{{ className: 'lead' }}
+
+---
+
+## Complete Multipart Upload {{ tag: 'POST', label: '/v1/multipart-upload/complete' }}
+
+<Row>
+  <Col>
+
+    In order for S3 to assemble the uploaded parts of an object and make it available, the multipart upload must be completed. This endpoint allows you to complete a multipart upload.
+
+    ### Required attributes
+
+    <Properties>
+      <Property name="uploadId" type="string">
+        Id of the multipart upload. This is returned when you initiate the multipart upload.
+      </Property>
+      <Property name="key" type="string">
+        Key of the uploaded object.
+      </Property>
+      <Property name="completedParts" type="CompletedPart[]">
+        List of `CompletedPart` objects. Each `CompletedPart` object contains the `partNumber` and `eTag` of the part.
+
+        The `eTag` is returned from AWS when you upload a part using a presigned URL.
+      </Property>
+    </Properties>
+
+    ```ts {{title: 'CompletedPart'}}
+    type CompletedPart {
+      partNumber: number;
+      eTag: string;
+    }
+    ```
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag='POST' label='/v1/multipart-upload/complete'>
+
+    ```ts
+    import { Uploadjoy } from "@uploadjoy/client";
+
+    const ujClient = new Uploadjoy({
+      apiToken: process.env.UPLOADJOY_API_TOKEN,
+    });
+
+    const response = await ujClient.multipartUpload.complete({
+      uploadId: "uploadId123",
+      key: "foo.jpg",
+      completedParts: [
+        { partNumber: 1, eTag: "etag123" },
+        { partNumber: 2, eTag: "etag456" },
+      ],
+    });
+    ```
+
+    </CodeGroup>
+
+    ```ts {{ title: 'Response' }}
+    type Response {
+      data?: {
+        uploadId: string;
+        key: string;
+      }
+      httpError?: HTTPError
+    }
+    ```
+
+  </Col>
+</Row>
+
+---
+
+## Abort Multipart Upload {{ tag: 'POST', label: '/v1/multipart-upload/abort' }}
+
+<Row>
+  <Col>
+
+    Use this endpoint to abort a multipart upload.
+
+    ### Required attributes
+
+    <Properties>
+      <Property name="uploadId" type="string">
+        Id of the multipart upload. This is returned when you initiate the multipart upload.
+      </Property>
+      <Property name="key" type="string">
+        Key of the uploaded object.
+      </Property>
+    </Properties>
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="POST" label='/v1/multipart-upload/abort'>
+
+    ```ts
+    import { Uploadjoy } from "@uploadjoy/client";
+
+    const ujClient = new Uploadjoy({
+      apiToken: process.env.UPLOADJOY_API_TOKEN,
+    });
+
+    const response = await ujClient.multipartUpload.abort({
+      uploadId: "uploadId123",
+      key: "foo.jpg",
+    });
+    ```
+
+    </CodeGroup>
+
+    ```ts {{ title: 'Response' }}
+    type Response {
+      data?: {
+        uploadId: string;
+        key: string;
+      }
+      httpError?: HTTPError;
+    }
+    ```
+
+  </Col>
+</Row>

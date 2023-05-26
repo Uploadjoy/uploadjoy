@@ -11,5 +11,7 @@
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": [
+    "@examples/next-pagedir",
+    "@uploadjoy/docs"
   ]
 }

@@ -1,0 +1,15 @@
+:root {
+  --shiki-color-text: theme('colors.white');
+  --shiki-token-constant: theme('colors.primary.300');
+  --shiki-token-string: theme('colors.primary.300');
+  --shiki-token-comment: theme('colors.zinc.500');
+  --shiki-token-keyword: theme('colors.blue.300');
+  --shiki-token-parameter: theme('colors.violet.300');
+  --shiki-token-function: theme('colors.rose.300');
+  --shiki-token-string-expression: theme('colors.emerald.300');
+  --shiki-token-punctuation: theme('colors.zinc.200');
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

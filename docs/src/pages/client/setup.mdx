@@ -1,0 +1,90 @@
+export const description =
+  "This guide will get you all set up and ready to use the Uploadjoy API. We’ll cover how to get started an API client and how to make your first API request.";
+
+# API Client setup
+
+This guide will get you all set up and ready to use the Uploadjoy API via a Typescript API client. We'll cover how to get started using the API client and how to make your first API request. We'll also look at where to go next to find all the information you need to take full advantage of our powerful REST API. {{ className: 'lead' }}
+
+## Get the client
+
+Before making your first API request, you need to install the Uploadjoy client
+in your Node.js project. You can install the client using any package manager you wish.
+
+<CodeGroup>
+
+```bash
+npm install @uploadjoy/client --save
+```
+
+</CodeGroup>
+
+<div className="not-prose">
+  <Button
+    href="https://www.npmjs.com/package/@uploadjoy/client"
+    variant="text"
+    arrow="right"
+    children="View client on NPM"
+    target="_blank"
+  />
+</div>
+
+## Making your first API request
+
+After picking your preferred client, you are ready to make your first call to the Uploadjoy API. Below, you can see how to send a request to get a presigned URL to download a specific object.
+
+<CodeGroup tag="POST" label="/v1/persigned-url">
+
+```js
+import { Uploadjoy } from "@uploadjoy/client";
+
+export const ujClient = new Uploadjoy({
+  apiToken: process.env.UPLOADJOY_API_TOKEN,
+});
+
+const keys = ["my-private-file.jpg"];
+const response = await ujClient.presignedUrl.downloadPrivateObjects({
+  keys,
+  presignedUrlOptions: { expiresIn: 3600 },
+});
+
+console.log(response.data);
+```
+
+</CodeGroup>
+
+<div className="not-prose">
+  <Button
+    href="/presignedUrls"
+    variant="text"
+    arrow="right"
+    children="Read the docs for the Presigned URLs endpoint"
+    target="_blank"
+  />
+</div>
+
+## What's next?
+
+Great, you're now set up with an API client and have made your first request to the API. Here are a few links that might be handy as you venture further:
+
+- <div className="not-prose m-0">
+    <Button
+      href="https://uploadjoy.com/app"
+      variant="text"
+      children="Get your API key from the Uploadjoy dashboard"
+      target="_blank"
+    />
+  </div>
+- <div className="not-prose m-0">
+    <Button
+      href="/client/presignedUrls"
+      variant="text"
+      children="Check out the Presigned URLs endpoint"
+    />
+  </div>
+- <div className="not-prose m-0">
+    <Button
+      href="/client/multipartUploads"
+      variant="text"
+      children="Check out the Multi-Part Upload endpoint"
+    />
+  </div>

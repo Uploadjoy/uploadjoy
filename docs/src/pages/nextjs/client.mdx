@@ -1,0 +1,140 @@
+export const description =
+  "This is the API documentation for @uploadjoy/next/client thats covers integrating a file selector and uploader into your Next.js application.";
+
+<Note>
+  `@uploadjoy/next` is built to work with Next.js's `pages` directory. We are
+  currently working on building a package for the new beta `app` directory.
+</Note>
+
+# @uploadjoy/next/client
+
+This is the API documentation for @uploadjoy/next/client thats covers integrating a file selector and uploader into your Next.js application.
+
+## `useInput` Usage
+
+After installing `@uploadjoy/next`, create a new React component or Next.js page and import `useInput`.
+
+```tsx
+import { type NextPage } from "next";
+import { useInput } from "@uploadjoy/next/client";
+
+const Home: NextPage = () => {
+  const { uploadFiles, openFileDialog, getInputProps } = useInput({
+    folder: "my-folder/",
+    fileAccess: "private",
+  });
+
+  return (
+    <>
+      {/* hidden file input element */}
+      <input {...getInputProps()} />
+      <button onClick={openFileDialog}>Open</button>
+      <button
+        onClick={async () => {
+          await uploadFiles();
+        }}
+      >
+        Submit
+      </button>
+    </>
+  );
+};
+
+export default Home;
+```
+
+## `useInput` Configuration
+
+The `useInput` hook accepts a host of configuration options to customize the behavior of the file selector and uploader:
+
+```ts
+type CallbackParams = {
+  fileName: string;
+  fileSize: number;
+  fileType: string;
+  location: string;
+  fileAccess: "public" | "private";
+};
+
+export type ClientUploadCallback<T = object> = (
+  input: CallbackParams & T
+) => Promise<void> | void;
+
+export type ClientUploadProgressCallback = ClientUploadCallback<{
+  uploadProgress: Pick<ProgressEvent, "loaded" | "total">;
+}>;
+
+type UseInputOptions = {
+  /**
+   * Record of MIME types and file extensions to accept.
+   *
+   * This prop is used to define the `accept` attribute in the input element,
+   * and the `accept` option in the file picker.
+   *
+   * @example { "image/*": [".png", ".jpg", ".jpeg"] }
+   * @example { "video/*": [".mp4"] }
+   */
+  accept?: AcceptProp;
+  /**
+   *  Set to `true` to accept all files regardless of the `accept` prop.
+   *  @default false
+   */
+  acceptAll?: boolean;
+  /**
+   * Set to `true` to allow multiple files to be selected.
+   * @default true
+   */
+  multiple?: boolean;
+  /**
+   * Sets the `disabled` attribute on the input element.
+   * @default false
+   */
+  disabled?: boolean;
+  /**
+   *
+   * User defined validator function to validate files before presigned URLs
+   * are fetched.
+   * @returns undefined` if the file is valid. Otherwise, an error object with
+   * a `code` and `message` property.
+   */
+  validator?: FileValidator;
+  /**
+   * Minimum file size in bytes.
+   */
+  minSize?: number;
+  /**
+   * Maximum file size in bytes.
+   */
+  maxSize?: number;
+  /**
+   * Maximum number of files allowed to be selected by the user.
+   */
+  maxFiles?: number;
+  /**
+   * File access mode. `public` files are accessible by anyone with the
+   * Uploadjoy CDN URL. `private` files are accessible by presigned URLs.
+   * @default "private"
+   */
+  fileAccess: "public" | "private";
+  /**
+   * Folder to upload files to.
+   *
+   * @example "my-folder/my-subfolder/"
+   */
+  folder?: string;
+  onFileDialogCancel?: () => void;
+  onFileDialogOpen?: () => void;
+  onFileDialogError?: (error: Error) => void;
+
+  /**
+   * Callbacks for client-side upload progress and success/error events.
+   * These callbacks are run on the client only. They are useful for updating
+   * the UI with the state of te upload, e.g. toasting on success or error.
+   */
+  clientCallbacks?: {
+    onUploadProgress?: ClientUploadProgressCallback;
+    onUploadSuccess?: ClientUploadCallback;
+    onUploadError?: ClientUploadCallback;
+  };
+};
+```
