@@ -1,0 +1,241 @@
+export const description =
+  "On this page, we’ll dive into the different presigned URL endpoints you can use to interact with objects stored in S3.";
+
+# Presigned URLs
+
+Presigned URLs are an essential part of Uploadjoy and S3. They allow you to securely share the ability access and upload objects, operations that would otherwise be private. You can read more about presigned URLs in the [S3 documentation](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html).{{ className: 'lead' }}
+
+The Uploadjoy API provides a number of endpoints that allow you to generate presigned URLs for uploading and downloading objects. You can use these endpoints to generate presigned URLs on behalf of your users so they can upload and download objects without having to share their API token.{{ className: 'lead' }}
+
+---
+
+## Presigned URL options model
+
+You can configure the presigned URL returned by the API by passing an object to the optional `presignedUrlOptions` parameter to any of the endpoints below. The following properties are available:
+
+<Row>
+  <Col>
+    <Properties>
+      <Property name="expiresIn" type="integer">
+        The number of seconds before the presigned URL expires. Defaults to
+        **3600 seconds (1 hour)**.
+      </Property>
+    </Properties>
+  </Col>
+</Row>
+
+---
+
+## Access private objects {{ tag: 'POST', label: '/v1/presigned-url/get-private-object' }}
+
+<Row>
+  <Col>
+
+    This endpoint allows you to get presigned URLs to access and download private objects stored in S3.
+
+    ### Required attributes
+
+    <Properties>
+      <Property name="keys" type="string[]">
+        Keys of the objects to get presigned URLs for.
+      </Property>
+    </Properties>
+
+    ### Optional attributes
+
+    <Properties>
+      [`presignedUrlOptions`](/presignedUrls#presigned-url-options-model)
+    </Properties>
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag='POST' label='/v1/presigned-url/get-private-object'>
+
+    ```ts
+    import { Uploadjoy } from "@uploadjoy/client";
+
+    const ujClient = new Uploadjoy({
+      apiToken: process.env.UPLOADJOY_API_TOKEN,
+    });
+
+    const keys = ["my-private-file.jpg"];
+    const response = await ujClient.presignedUrl
+      .downloadPrivateObjects(
+        {
+          keys,
+          presignedUrlOptions: { expiresIn: 3600 },
+        }
+      );
+    ```
+
+    </CodeGroup>
+
+    ```ts {{ title: 'Response' }}
+    type Response {
+      data?: {
+        presignedUrls: {
+          key: string;
+          // presigned URL for key
+          url?: string;
+          // error getting presigned URL for specific key
+          error?: string;
+        }[];
+      }
+      httpError?: HTTPError
+    }
+    ```
+
+  </Col>
+</Row>
+
+---
+
+## Upload an object {{ tag: 'POST', label: '/v1/presigned-url/put-objects' }}
+
+<Row>
+  <Col>
+
+    This endpoint allows you to get presigned URLs to upload objects.
+
+    ### Required attributes
+
+    <Properties>
+      <Property name="objects" type="Object[]">
+        List of `Object` to create presigned URLs for.
+      </Property>
+    </Properties>
+
+    ```ts {{title: 'Object'}}
+    type Object {
+      key: string;
+      visibility: "public" | "private";
+      presignedUrlOptions?: PresignedUrlOptions;
+    }
+    ```
+
+    ### Optional attributes
+
+    <Properties>
+      [`presignedUrlOptions`](/presignedUrls#presigned-url-options-model)
+    </Properties>
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="POST" label='/v1/presigned-url/put-objects'>
+
+    ```ts
+    import { Uploadjoy } from "@uploadjoy/client";
+
+    const ujClient = new Uploadjoy({
+      apiToken: process.env.UPLOADJOY_API_TOKEN,
+    });
+
+    const response = await ujClient.presignedUrl
+      .uploadObjects(
+        {
+          objects: [
+            { key: "new.jpg", visibility: "private", },
+          ]
+        }
+      );
+    ```
+
+    </CodeGroup>
+
+    ```ts {{ title: 'Response' }}
+    type Response {
+      data?: {
+        presignedUrls: {
+          key: string;
+          visibility: Visibility;
+          url?: string;
+          fields?: Record<string, string>;
+          error?: string;
+        }[];
+      }
+      httpError?: HTTPError;
+    }
+    ```
+
+  </Col>
+</Row>
+
+---
+
+## Multipart upload an object {{ tag: 'POST', label: '/v1/presigned-url/multipart-upload-objects' }}
+
+<Row>
+  <Col>
+
+    This endpoint allows you to get presigned URLs to upload objects using multipart upload. Read about S3 multipart upload [here](https://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html).
+
+    ### Required attributes
+
+    <Properties>
+      <Property name="key" type="string">
+        Key of the object.
+      </Property>
+      <Property name="visibility" type="string">
+        "public" | "private"
+      </Property>
+      <Property name="filePartNames" type="string[]">
+        List of names for each part of the file, in order.
+      </Property>
+    </Properties>
+
+    ### Optional attributes
+
+    <Properties>
+      [`presignedUrlOptions`](/presignedUrls#presigned-url-options-model)
+    </Properties>
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="POST" label="/v1/presigned-url/multipart-upload-objects">
+
+    ```ts
+    import { Uploadjoy } from "@uploadjoy/client";
+
+    const ujClient = new Uploadjoy({
+      apiToken: process.env.UPLOADJOY_API_TOKEN,
+    });
+
+    const response = await ujClient.presignedUrl
+      .multipartUploadObject({
+        key: "key.jpg",
+        filePartNames: ["part-1.jpg", "part-2.jpg"],
+        visibility: "private",
+      });
+    ```
+
+    </CodeGroup>
+
+    ```ts {{ title: 'Response' }}
+    type Response {
+      data?: {
+        key: string;
+        visibility: "public" | "private";
+        /*
+          ID of the multi-part upload.
+          Required for completing or aborting the upload.
+        */
+        uploadId: string;
+        // presigned URLs to upload each part of the file
+        presignedUrls:
+        | {
+            filePartName: string;
+            url?: string;
+            fields?: Record<string, string>;
+            partNumber?: number;
+            error?: string;
+          }[];
+        }
+      httpError?: HTTPError;
+    }
+    ```
+
+  </Col>
+</Row>
