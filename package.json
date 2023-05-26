@@ -16,7 +16,7 @@
   "scripts": {
     "typecheck": "turbo typecheck",
     "build": "turbo build",
-    "build:docs": "turbo build --filter:@uploadjoy/docs",
+    "build:docs": "turbo --filter=@uploadjoy/docs build",
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "turbo format && prettier --write *.{cjs,md,json}",
