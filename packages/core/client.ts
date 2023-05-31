@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 export type {
-  AllowedFiles,
   ClientOnUploadCallback,
   ClientOnUploadFailureCallback,
   ClientOnUploadProgressCallback,
@@ -77,7 +76,6 @@ const uploadFile = async ({
 
     const xhr = new XMLHttpRequest();
     xhr.open("POST", url, true);
-    xhr.setRequestHeader("Content-Type", file.type);
 
     xhr.upload.onprogress = async (event: ProgressEvent) => {
       if (onUploadProgress)
@@ -121,6 +119,8 @@ const uploadFile = async ({
     };
 
     xhr.send(form);
+  }).catch((e) => {
+    console.error(e);
   });
 };
 
@@ -140,6 +140,8 @@ export const uploadFiles = async ({
   };
 }) => {
   const urls = presignedUrls.urls;
+  const isDev = process.env.NODE_ENV === "development";
+
   const uploadPromises = urls.map((urlData) => {
     const fileName = urlData.key.split("/").pop() as string;
     const file = files.find((f) => f.name === fileName);
@@ -147,6 +149,19 @@ export const uploadFiles = async ({
     if (!file) {
       console.error("No file found for presigned URL", urlData);
       throw new Error("No file found for presigned URL");
+    }
+
+    if (isDev) {
+      // we trigger the dev server in order to simulate a upload webhook
+      void fetch("/api/uploadjoy", {
+        method: "POST",
+        body: JSON.stringify({
+          uploadRequestId: urlData.uploadjoyUploadRequestId,
+        }),
+        headers: {
+          "uploadjoy-hook": "devServer",
+        },
+      });
     }
 
     return uploadFile({

@@ -26,28 +26,21 @@ type UploadedFile = {
   size: number;
 };
 
-type MimeTypes =
-  | "application"
+/**
+ * Discrete MIME type https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_Types
+ * "blob" is a catch-all for any file type not explicitly supported
+ */
+export type AllowedFileType =
+  | "image"
+  | "video"
   | "audio"
   | "font"
-  | "image"
-  | "message"
-  | "model"
-  | "multipart"
   | "text"
-  | "video";
+  | "model"
+  | "application"
+  | "blob";
 
 type FileExtension = `.${string}`;
-
-// Unfortunately, Typescript does not have a way to check of a nonempty string, so "image/" is valid as a type but not as an actual MIME type
-type MimeString = `${MimeTypes}/${string}`;
-
-type MimeTypesWithWildcard = `${MimeTypes}/*`;
-
-export type AllowedFiles = Record<
-  MimeTypesWithWildcard | MimeString,
-  (FileExtension | "*")[]
->;
 
 export type ClientOnUploadCallback = (input: {
   file: File;
@@ -75,9 +68,47 @@ export type PresignedUrlRequestResponse = {
   }[];
 };
 
-export type SizeUnit = "B" | "KB" | "MB" | "GB";
 type PowOf2 = 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128 | 256 | 512 | 1024;
+export type SizeUnit = "B" | "KB" | "MB" | "GB";
 export type FileSize = `${PowOf2}${SizeUnit}`;
+
+type BlobTypeRouteConfig = {
+  maxFileSize?: FileSize;
+  maxFileCount?: number;
+};
+
+export type RouteConfigExBlob<TMime extends Exclude<AllowedFileType, "blob">> =
+  {
+    maxFileSize?: FileSize;
+    maxFileCount?: number;
+    /**
+     * Specific MIME types to accept. Specifying `${type}/*` takes precedence over other MIME types, and accepts all types.
+     *
+     * @example ["image/png", "image/jpeg"]
+     * @example ["video/*"]
+     */
+    acceptedFiles?: `${TMime}/${string}`[];
+  };
+
+export type RouteConfig<TMime extends AllowedFileType> = TMime extends "blob"
+  ? BlobTypeRouteConfig
+  : TMime extends Exclude<AllowedFileType, "blob">
+  ? RouteConfigExBlob<TMime>
+  : never;
+
+// Used to ensure that at least one of the keys is set in the config
+type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> &
+  U[keyof U];
+
+export type NestedFileRouterConfig = AtLeastOne<{
+  [TType in AllowedFileType]: RouteConfig<TType>;
+}>;
+
+export type ExpandedNestedFileRouterConfig = AtLeastOne<{
+  [TType in AllowedFileType]: Required<RouteConfig<TType>>;
+}>;
+
+export type FileRouterInputConfig = NestedFileRouterConfig;
 
 type ResolverOptions<TParams extends AnyParams> = {
   metadata: Simplify<
@@ -88,26 +119,47 @@ type ResolverOptions<TParams extends AnyParams> = {
   uploadjoyUploadRequestId: string;
 };
 
-type Files = {
+// middleware context allows users to easily access data relevant to the upload request
+type MiddlewareContext = {
   files: { name: string; size: number; type: string }[];
 };
 
-export type ReqMiddlewareFn<TOutput extends Record<string, unknown>> = (
+/** middleware output allows users to pass metadata and add per upload configuration to the upload */
+type MiddlewareOutput = {
+  /** metadata stored with the object on upload */
+  metadata?: Record<string, unknown>;
+
+  /** Folder to upload object to. If not set,
+   * the object will be uploaded to the root of your project.
+   *
+   * Folders need not exist prior to upload.
+   * Folders should not end with a trailing slash.
+   *
+   * @example `${userId}/images`
+   *
+   * The S3 key of an object uploaded to
+   * the above example folder would be
+   * `${projectName}/${userId}/images/${fileName}`
+   */
+  folder?: string;
+};
+
+export type ReqMiddlewareFn<TOutput extends MiddlewareOutput> = (
   req: Request,
-  files: Files,
+  ctx: MiddlewareContext,
 ) => MaybePromise<TOutput>;
-export type NextReqMiddlewareFn<TOutput extends Record<string, unknown>> = (
+export type NextReqMiddlewareFn<TOutput extends MiddlewareOutput> = (
   req: NextRequest,
-  files: Files,
+  ctx: MiddlewareContext,
 ) => MaybePromise<TOutput>;
-export type NextApiMiddlewareFn<TOutput extends Record<string, unknown>> = (
+export type NextApiMiddlewareFn<TOutput extends MiddlewareOutput> = (
   req: NextApiRequest,
-  files: Files,
+  ctx: MiddlewareContext,
   res: NextApiResponse,
 ) => MaybePromise<TOutput>;
 
 type MiddlewareFn<
-  TOutput extends Record<string, unknown>,
+  TOutput extends MiddlewareOutput,
   TRuntime extends string,
 > = TRuntime extends "web"
   ? ReqMiddlewareFn<TOutput>
@@ -120,14 +172,11 @@ type ResolverFn<TParams extends AnyParams> = (
 ) => MaybePromise<void>;
 
 export interface UploadBuilder<TParams extends AnyParams> {
-  fileTypes: (types: AllowedFiles) => UploadBuilder<TParams>;
-  maxSize: (size: FileSize) => UploadBuilder<TParams>;
   access: (access: "public" | "private") => UploadBuilder<TParams>;
-  maxFiles: (maxFiles: number) => UploadBuilder<TParams>;
-  middleware: <TOutput extends Record<string, unknown>>(
+  middleware: <TOutput extends MiddlewareOutput>(
     fn: MiddlewareFn<TOutput, TParams["_runtime"]>,
   ) => UploadBuilder<{
-    _metadata: TOutput;
+    _metadata: TOutput["metadata"];
     _runtime: TParams["_runtime"];
   }>;
 
@@ -135,11 +184,9 @@ export interface UploadBuilder<TParams extends AnyParams> {
 }
 
 export type UploadBuilderDef<TRuntime extends AnyRuntime> = {
-  fileTypes: AllowedFiles;
-  maxSize: FileSize;
   access: "public" | "private";
-  maxFiles?: number;
-  middleware: MiddlewareFn<{}, TRuntime>;
+  middleware: MiddlewareFn<MiddlewareOutput, TRuntime>;
+  routerConfig: FileRouterInputConfig;
 };
 
 export interface Uploader<TParams extends AnyParams> {

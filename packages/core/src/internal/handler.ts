@@ -3,11 +3,16 @@ import type {
   AnyRuntime,
   FileRouter,
   PresignedUrlRequestResponse,
+  NestedFileRouterConfig,
+  AllowedFileType,
+  RouteConfig,
 } from "../types";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { fillInputRouteConfig as parseAndExpandInputConfig } from "../utils";
+import { lookup } from "mime-types";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const UPLOADJOY_VERSION = require("../../package.json").version;
+const UPLOADJOY_VERSION = require("../../package.json").version as string;
 
 const UNITS = ["B", "KB", "MB", "GB"] as const;
 type SizeUnit = (typeof UNITS)[number];
@@ -30,14 +35,104 @@ export const fileSizeToBytes = (input: string) => {
   return Math.floor(bytes);
 };
 
+const fileVerificationFailed = (
+  files: z.infer<typeof uploadActionBodySchema>["files"],
+  routeConfig: NestedFileRouterConfig,
+  debug: boolean,
+) => {
+  const fileTypes = new Set(Object.keys(routeConfig) as AllowedFileType[]);
+
+  const hasBlobCatchAll = fileTypes.has("blob");
+
+  // sort the files into their respective types
+  const buckets: Partial<
+    Record<AllowedFileType, z.infer<typeof uploadActionBodySchema>["files"]>
+  > = {};
+
+  for (const file of files) {
+    let type: string | undefined | false = file.type.split("/")[0];
+    if (!type) {
+      type = lookup(file.name);
+    }
+
+    if (!type) {
+      if (debug) {
+        console.warn(
+          `[UPLOADJOY][DEBUG] Could not determine file type for ${file.name}.`,
+        );
+      }
+      return true;
+    }
+
+    if (!buckets[type as AllowedFileType])
+      buckets[type as AllowedFileType] = [];
+    else {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - buckets[type] is defined
+      buckets[type].push(file);
+    }
+  }
+
+  for (const [type, files] of Object.entries(buckets)) {
+    if (!fileTypes.has(type as AllowedFileType) && !hasBlobCatchAll) {
+      return true;
+    }
+
+    const count = files.length;
+    const config = routeConfig[
+      type as AllowedFileType
+    ] as RouteConfig<AllowedFileType>;
+
+    if (config.maxFileCount && count > config.maxFileCount) {
+      return true;
+    }
+
+    for (const file of files) {
+      const configMaxSizeInBytes = fileSizeToBytes(config.maxFileSize ?? "");
+      if (typeof configMaxSizeInBytes !== "number") {
+        return true;
+      }
+      if (config.maxFileSize && file.size > configMaxSizeInBytes) {
+        return true;
+      }
+
+      // If there is a catchall blob type, we accept all files
+      if (hasBlobCatchAll) {
+        continue;
+      }
+
+      // If there is no acceptedFiles config, we accept all files under type
+      // TODO: fix these any casts
+      if ((config as any).acceptedFiles) {
+        const allowedFileTypes = new Set((config as any).acceptedFiles);
+        // if the catchall filetype is in the set, we accept all files
+        if (allowedFileTypes.has(`${type}/*` as any)) {
+          continue;
+        }
+
+        let fileType: string | false = file.type;
+
+        if (!fileType || fileType === "") {
+          fileType = lookup(file.name);
+          if (!fileType) {
+            return true;
+          }
+        }
+
+        if (!allowedFileTypes.has(fileType as any)) {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
+};
+
 const generateUploadJoyURL = (path: `/${string}`) => {
   const host = process.env.CUSTOM_INFRA_URL ?? "https://uploadjoy.com";
   return `${host}${path}`;
 };
-
-if (process.env.NODE_ENV !== "development") {
-  console.log("[UJ] UploadThing dev server is now running!");
-}
 
 const isValidResponse = (response: Response) => {
   if (!response.ok) return false;
@@ -67,7 +162,7 @@ const withExponentialBackoff = async <T>(
 
     if (tries > 3) {
       console.error(
-        `[UJ] Call unsuccessful after ${tries} tries. Retrying in ${Math.floor(
+        `[UPLOADJOY] Call unsuccessful after ${tries} tries. Retrying in ${Math.floor(
           backoffMs / 1000,
         )} seconds...`,
       );
@@ -86,31 +181,32 @@ const conditionalDevServer = async (requestId: string, upSecret: string) => {
     `/api/pollUpload?uploadRequestId=${requestId}`,
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const fileData = await withExponentialBackoff(async () => {
     const res = await fetch(queryUrl, {
       headers: {
         Authorization: "Bearer " + upSecret,
       },
     });
+
     const json = await res.json();
-
     const file = json.fileData;
-
-    if (json.status !== "done") return null;
 
     let callbackUrl = file.callbackUrl + `?slug=${file.callbackSlug}`;
     if (!callbackUrl.startsWith("http")) callbackUrl = "http://" + callbackUrl;
 
-    console.log("[UJ] SIMULATING FILE UPLOAD WEBHOOK CALLBACK", callbackUrl);
+    console.log("[UPLOADJOY][DEV] SIMULATING FILE UPLOAD WEBHOOK CALLBACK", {
+      key: file.key,
+      access: file.access,
+    });
 
     // TODO: Check that we "actually hit our endpoint" and throw a loud error if we didn't
     const response = await fetch(callbackUrl, {
       method: "POST",
       body: JSON.stringify({
         uploadjoyUploadRequestId: requestId,
-        metadata: JSON.parse(file.metadata ?? "{}"),
+        metadata: file.metadata ?? {},
         file: {
-          // TODO: change this URL
           url: file.url,
           key: file.key,
           name: file.name,
@@ -123,11 +219,17 @@ const conditionalDevServer = async (requestId: string, upSecret: string) => {
       },
     });
     if (isValidResponse(response)) {
-      console.log("[UJ] Successfully simulated callback for file", file);
+      console.log("[UPLOADJOY][DEV] Successfully simulated callback for file", {
+        key: file.key,
+        access: file.access,
+      });
     } else {
       console.error(
-        "[UJ] Failed to simulate callback for file. Is your webhook configured correctly?",
-        requestId,
+        "[UPLOADJOY][DEV] Failed to simulate callback for file. Is your webhook configured correctly?",
+        {
+          key: file.key,
+          access: file.access,
+        },
       );
     }
     return file;
@@ -135,7 +237,9 @@ const conditionalDevServer = async (requestId: string, upSecret: string) => {
 
   if (fileData !== null) return fileData;
 
-  console.error(`[UJ] Failed to simulate callback for upload ${requestId}`);
+  console.error(
+    `[UPLOADJOY][DEV] Failed to simulate callback for upload ${requestId}`,
+  );
   throw new Error("File took too long to upload");
 };
 
@@ -152,6 +256,8 @@ export type RouterWithConfig<TRouter extends FileRouter> = {
   config?: {
     callbackUrl?: string;
     uploadjoySecret?: string;
+    /** Enables verbose logging for debugging */
+    debug?: boolean;
   };
 };
 
@@ -180,8 +286,27 @@ export const buildRequestHandler = <
   }) => {
     const { router, config } = opts;
     const upSecret = config?.uploadjoySecret ?? process.env.UPLOADJOY_SECRET;
+    const isDev = process.env.NODE_ENV === "development";
+    const { debug } = config ?? {};
 
     const { uploadjoyHook, slug, req, res, actionType } = input;
+    let reqBody;
+
+    if ("body" in req && typeof req.body === "string") {
+      reqBody = JSON.parse(req.body);
+    } else {
+      reqBody = await (req as Request).json();
+    }
+
+    if (isDev && uploadjoyHook && uploadjoyHook === "devServer") {
+      void conditionalDevServer(
+        reqBody.uploadRequestId as string,
+        upSecret ?? "",
+      );
+
+      return { status: 200 };
+    }
+
     if (!slug) throw new Error("we need a slug");
     const uploadable = router[slug];
 
@@ -190,11 +315,6 @@ export const buildRequestHandler = <
     }
 
     const access = uploadable._def.access;
-
-    const reqBody =
-      "body" in req && typeof req.body === "string"
-        ? JSON.parse(req.body)
-        : await (req as Request).json();
 
     if (uploadjoyHook && uploadjoyHook === "callback") {
       // This is when we receive the webhook from uploadjoy
@@ -217,55 +337,61 @@ export const buildRequestHandler = <
     try {
       const parseResult = uploadActionBodySchema.safeParse(reqBody);
       if (!parseResult.success) {
-        console.error("[UJ] invalid request body for upload action");
+        console.error("[UPLOADJOY] invalid request body for upload action");
+        console.log(reqBody);
+        console.log(parseResult.error.issues);
         throw new Error("Invalid request body for upload action");
       }
 
       const { files } = parseResult.data;
 
-      const maxFiles = uploadable._def.maxFiles;
-      if (maxFiles && files.length > maxFiles) {
-        throw new Error("Too many files");
-      }
-
-      const metadata = await uploadable._def.middleware(
+      const middlewareOutput = await uploadable._def.middleware(
         // @ts-expect-error TODO: Fix this
         req as Request,
         { files },
         res,
       );
 
-      // if folder is set, we validate it and throw if it's not valid
-      // @ts-expect-error TODO: Fix this
-      const { folder } = metadata;
+      const { folder, metadata } = middlewareOutput;
       if (folder) {
         if (typeof folder !== "string")
           throw new Error("Folder must be a string");
         // TODO: Validate folder with regex
       }
 
-      // Once that passes, persist in DB
-
       // Validate without Zod (for now)
-      if (!Array.isArray(files) || !files.every((f) => typeof f === "string"))
-        throw new Error("Need file array");
+      if (!Array.isArray(files)) throw new Error("Need file array");
 
-      // TODO: Make this a function
+      // FILL THE ROUTE CONFIG so the server only has one happy path
+      const parsedConfig = parseAndExpandInputConfig(
+        uploadable._def.routerConfig,
+      );
+
+      const verificationFailed = fileVerificationFailed(
+        files,
+        parsedConfig,
+        debug ?? false,
+      );
+
+      if (verificationFailed) throw new Error("File verification failed");
+
+      // TODO: fix for new router config
       const uploadjoyApiResponse = await fetch(
         generateUploadJoyURL("/api/prepareUpload"),
         {
           method: "POST",
           body: JSON.stringify({
             files: files.map((f) => ({
-              ...f,
+              key: `${folder ? folder + "/" : ""}${f.name}`,
               uploadType: "standard",
+              size: f.size,
+              type: f.type ?? lookup(f.name) ?? "application/octet-stream",
             })),
-            fileTypes: uploadable._def.fileTypes,
+            config: parsedConfig,
             fileAccess: access,
             metadata,
             callbackUrl: config?.callbackUrl ?? GET_DEFAULT_URL(),
             callbackSlug: slug,
-            maxFileSize: fileSizeToBytes(uploadable._def.maxSize ?? "16MB"),
           }),
           headers: {
             "Content-Type": "application/json",
@@ -276,14 +402,18 @@ export const buildRequestHandler = <
       );
 
       if (!uploadjoyApiResponse.ok) {
-        console.error("[UJ] unable to get presigned urls");
+        console.error("[UPLOADJOY] unable to get presigned urls");
         try {
           const error = await uploadjoyApiResponse.json();
-          console.error(error);
+          console.error(`${uploadjoyApiResponse.status} status code: `, error);
         } catch (e) {
-          console.error("[UJ] unable to parse response");
+          console.error("[UPLOADJOY] unable to parse response");
         }
-        throw new Error("ending upload");
+        return {
+          status: 500,
+          message:
+            "Unable to get presigned urls from uploadjoy, check server logs.",
+        };
       }
 
       // This is when we send the response back to our form so it can submit the files
@@ -291,18 +421,16 @@ export const buildRequestHandler = <
       const parsedResponse =
         (await uploadjoyApiResponse.json()) as PresignedUrlRequestResponse;
 
-      if (process.env.NODE_ENV === "development") {
-        parsedResponse.urls.forEach((url) => {
-          void conditionalDevServer(
-            url.uploadjoyUploadRequestId,
-            upSecret ?? "",
-          );
-        });
+      if (debug) {
+        console.log(
+          "[UPLOADJOY][DEBUG] /api/prepareUpload response from uploadjoy: ",
+          JSON.stringify(parsedResponse, null, 2),
+        );
       }
 
       return { body: parsedResponse, status: 200 };
     } catch (e) {
-      console.error("[UJ] middleware failed to run");
+      console.error("[UPLOADJOY] middleware failed to run");
       console.error(e);
 
       return { status: 400, message: (e as Error).toString() };
@@ -318,11 +446,10 @@ export const buildPermissionsInfoHandler = <TRouter extends FileRouter>(
 
     const permissions = Object.keys(r).map((k) => {
       const route = r[k];
+      const config = parseAndExpandInputConfig(route._def.routerConfig);
       return {
         slug: k as keyof TRouter,
-        maxSize: route._def.maxSize,
-        fileTypes: route._def.fileTypes,
-        maxFiles: route._def.maxFiles,
+        config,
         access: route._def.access,
       };
     });

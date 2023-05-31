@@ -28,8 +28,13 @@ import type {
 } from "@uploadjoy/core/client";
 import { fetchPresignedUrls, uploadFiles } from "@uploadjoy/core/client";
 import { useEndpointMetadata } from "./useEndpointMetadata";
+import { FileRouter } from "@uploadjoy/core/server";
 
-type UseInputOptions<T extends string> = {
+type EndpointHelper<TRouter extends void | FileRouter> = void extends TRouter
+  ? "YOU FORGOT TO PASS THE GENERIC"
+  : keyof TRouter;
+
+type UseInputOptions<TRouter extends void | FileRouter = void> = {
   /**
    * Sets the `disabled` attribute on the input element.
    * @default false
@@ -39,7 +44,7 @@ type UseInputOptions<T extends string> = {
   onFileDialogOpen?: () => void;
   onFileDialogError?: (error: Error) => void;
 
-  endpoint: T;
+  endpoint: EndpointHelper<TRouter>;
 
   /**
    * Callbacks for client-side upload progress and success/error events.
@@ -135,25 +140,23 @@ const reducer: Reducer<UseInputPropsState, UseInputPropsAction> = (
   }
 };
 
-const useInput = <T extends string>({
+const useInput = <TRouter extends void | FileRouter = void>({
   disabled = false,
   onFileDialogCancel,
   onFileDialogOpen,
   onFileDialogError,
   clientCallbacks,
   endpoint,
-}: UseInputOptions<T>) => {
-  const permittedFileInfo = useEndpointMetadata(endpoint);
+}: UseInputOptions<TRouter>) => {
+  const permittedFileInfo = useEndpointMetadata(endpoint as string);
+
+  const { access, config, multiple } = permittedFileInfo ?? {};
 
   if (!permittedFileInfo) {
-    throw new Error(
-      `useInput: No permitted file info found for endpoint ${endpoint}`,
-    );
+    disabled = true;
+  } else {
+    disabled ||= false;
   }
-
-  const { access, maxSize, maxFiles, fileTypes } = permittedFileInfo;
-
-  const multiple = maxFiles !== 1;
 
   const onFileDialogOpenCb = useMemo(
     () => (typeof onFileDialogOpen === "function" ? onFileDialogOpen : noop),
@@ -218,35 +221,17 @@ const useInput = <T extends string>({
       const acceptedFiles: File[] = files;
       const fileRejections: FileRejectionError[] = [];
 
-      if (
-        (!multiple && acceptedFiles.length > 1) ||
-        (multiple &&
-          maxFiles &&
-          maxFiles >= 1 &&
-          acceptedFiles.length > maxFiles)
-      ) {
-        // Reject everything and empty accepted files
-        acceptedFiles.forEach((file) => {
-          fileRejections.push({
-            type: "file-rejection-error",
-            file,
-            errors: [
-              {
-                code: "too-many-files",
-                message: `Too many files. Maximum allowed is ${maxFiles}.`,
-              },
-            ],
-          });
-        });
-        acceptedFiles.splice(0);
-      }
+      // TODO: client side validation
 
       if (fileRejections.length > 0) {
         errors.push(...fileRejections);
       }
 
       if (acceptedFiles.length > 0 && errors.length === 0) {
-        const presignedUrls = await fetchPresignedUrls(acceptedFiles, endpoint);
+        const presignedUrls = await fetchPresignedUrls(
+          acceptedFiles,
+          endpoint as string,
+        );
 
         dispatch({
           acceptedFiles,
@@ -263,20 +248,57 @@ const useInput = <T extends string>({
         type: "setFiles",
       });
     },
-    [dispatch, multiple, maxSize, maxFiles],
+    [dispatch, multiple],
   );
+
+  const mimeTypesFromConfig = useMemo(() => {
+    if (!config) {
+      return;
+    }
+    // get the MIME types from the config
+    const mimeTypes = [];
+    for (const value of Object.values(config)) {
+      // @ts-ignore TODO: fix this, acceptedFiles is not defined for blob
+      const { acceptedFiles } = value;
+      mimeTypes.push(...(acceptedFiles as string[]));
+    }
+
+    return mimeTypes;
+  }, [config]);
 
   // Fn for opening the file dialog programmatically
   const openFileDialog = useCallback(() => {
     // No point to use FS access APIs if context is not secure
     // https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts#feature_detection
     if (fsAccessApiWorksRef.current) {
+      const mimeTypes = mimeTypesFromConfig;
+
+      if (!mimeTypes || !config) {
+        // TODO: better logging
+        console.error("No mime types found in config");
+        return;
+      }
+
+      const acceptAll = "blob" in config;
+
       dispatch({ type: "openDialog" });
       onFileDialogOpenCb();
       // https://developer.mozilla.org/en-US/docs/Web/API/window/showOpenFilePicker
       const opts = {
         multiple,
-        types: fileTypes ?? undefined,
+        types:
+          acceptAll || mimeTypes.length === 0
+            ? []
+            : [
+                {
+                  description: "Files",
+                  accept: mimeTypes
+                    .map((mimeType) => ({
+                      [mimeType]: [],
+                    }))
+                    .reduce((acc, curr) => ({ ...acc, ...curr }), {}),
+                },
+              ],
       };
       // any's needed to avoid TS error in build, idk why
       (window as any)
@@ -323,7 +345,6 @@ const useInput = <T extends string>({
     onFileDialogCancelCb,
     setFiles,
     onFileDialogErrCb,
-    fileTypes,
     multiple,
   ]);
 
@@ -339,9 +360,12 @@ const useInput = <T extends string>({
   const getInputProps = useMemo(
     () =>
       ({ onChange, onClick, ...rest }: HTMLProps<HTMLInputElement> = {}) => {
+        if (!config) {
+          return {};
+        }
+        const acceptAll = "blob" in config;
         const inputProps = {
-          // TODO:  get proper accept string
-          accept: undefined,
+          accept: acceptAll ? "*" : mimeTypesFromConfig?.join(", "),
           multiple,
           type: "file",
           style: { display: "none" },
@@ -368,12 +392,14 @@ const useInput = <T extends string>({
       console.log("No presigned URLs, cannot upload files");
       return;
     }
-    await uploadFiles({
-      presignedUrls,
-      files: acceptedFiles,
-      clientCallbacks,
-      access,
-    });
+    if (access && !disabled) {
+      await uploadFiles({
+        presignedUrls,
+        files: acceptedFiles,
+        clientCallbacks,
+        access,
+      });
+    }
 
     // TODO better error handling here, just reset for now
     dispatch({ type: "reset" });

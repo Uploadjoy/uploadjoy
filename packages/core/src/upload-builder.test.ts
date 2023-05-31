@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/ban-types */
+
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createBuilder } from "./upload-builder";
 import { expect, it, expectTypeOf } from "vitest";
 import { NextRequest } from "next/server";
+import { NestedFileRouterConfig } from "./types";
 
 const badReqMock = {
   headers: {
@@ -14,50 +15,56 @@ const badReqMock = {
   },
 } as unknown as Request;
 
-it("typeerrors for invalid input", async () => {
+const defaultConfig: NestedFileRouterConfig = {
+  image: {
+    maxFileSize: "4MB",
+    maxFileCount: 1,
+    acceptedFiles: ["image/png", "image/jpeg"],
+  },
+};
+
+it("type errors for invalid input", () => {
   const f = createBuilder();
 
   // @ts-expect-error - invalid file type
-  f.fileTypes(["png"]);
+  f(["png"]);
 
   // @ts-expect-error - invalid size format
-  f.maxSize("1gb");
+  f({ image: { maxFileSize: "1gb" } });
+
+  // @ts-expect-error - needs at least one of the keys
+  f({});
+
+  // @ts-expect-error - invalid file type
+  f({ notValid: { acceptedFiles: ["image/png", "image/jpeg", "image/gif"] } });
+
+  // @ts-expect-error - invalid accepted file type
+  f({ image: { acceptedFiles: ["video/xyz"] } });
 
   // @ts-expect-error - should return an object
-  f.middleware(async () => {
+  f(defaultConfig).middleware(() => {
     return null;
   });
 
   // @ts-expect-error - res does not exist (`pages` flag not set)
-  f.middleware(async (req, files, res) => {
+  f(defaultConfig).middleware((req, ctx, res) => {
     return {};
   });
 
-  f.middleware(() => ({ foo: "bar" })).onUploadComplete(({ metadata }) => {
-    // @ts-expect-error - bar does not exist
-    metadata.bar;
-    // @ts-expect-error - bar does not exist on foo
-    metadata.foo.bar;
-  });
-});
-
-it("uses defaults for not-chained", async () => {
-  const f = createBuilder();
-
-  const uploadable = f.onUploadComplete(() => {});
-
-  expect(uploadable._def.fileTypes).toEqual({ "image/*": ["*"] });
-  expect(uploadable._def.maxSize).toEqual("1MB");
-
-  const metadata = await uploadable._def.middleware(badReqMock, { files: [] });
-  expect(metadata).toEqual({});
-  expectTypeOf(metadata).toMatchTypeOf<{}>();
+  f(defaultConfig)
+    .middleware(() => ({ metadata: { foo: "bar" } }))
+    .onUploadComplete(({ metadata }) => {
+      // @ts-expect-error - bar does not exist
+      metadata.bar;
+      // @ts-expect-error - bar does not exist on foo
+      metadata.foo.bar;
+    });
 });
 
 it("passes `Request` by default", async () => {
   const f = createBuilder();
 
-  f.middleware(async (req) => {
+  f(defaultConfig).middleware(async (req) => {
     expectTypeOf(req).toMatchTypeOf<Request>();
 
     return {};
@@ -67,16 +74,16 @@ it("passes `Request` by default", async () => {
 it("passes `NextRequest` for /app", async () => {
   const f = createBuilder<"app">();
 
-  f.middleware(async (req) => {
+  f(defaultConfig).middleware(async (req) => {
     expectTypeOf(req).toMatchTypeOf<NextRequest>();
-    return { nextUrl: req.nextUrl };
+    return { metadata: { nextUrl: req.nextUrl } };
   });
 });
 
 it("passes `res` for /pages", async () => {
   const f = createBuilder<"pages">();
 
-  f.middleware(async (req, files, res) => {
+  f(defaultConfig).middleware(async (req, ctx, res) => {
     expectTypeOf(req).toMatchTypeOf<NextApiRequest>();
     expectTypeOf(res).toMatchTypeOf<NextApiResponse>();
 
@@ -87,13 +94,11 @@ it("passes `res` for /pages", async () => {
 it("smoke", async () => {
   const f = createBuilder();
 
-  const uploadable = f
-    .fileTypes({ "image/*": ["*"], "video/*": ["*"] })
-    .maxSize("1GB")
+  const uploadable = f(defaultConfig)
     .middleware(async (req) => {
       const header1 = req.headers.get("header1");
 
-      return { header1, userId: "123" as const };
+      return { metadata: { header1, userId: "123" as const } };
     })
     .onUploadComplete(({ file, metadata }) => {
       // expect(file).toEqual({ name: "file", url: "http://localhost" })
@@ -106,12 +111,8 @@ it("smoke", async () => {
       }>();
     });
 
-  expect(uploadable._def.fileTypes).toEqual({
-    "image/*": ["*"],
-    "video/*": ["*"],
-  });
-  expect(uploadable._def.maxSize).toEqual("1GB");
+  expect(uploadable._def.routerConfig).toEqual(defaultConfig);
 
-  const metadata = await uploadable._def.middleware(badReqMock, { files: [] });
-  expect(metadata).toEqual({ header1: "woohoo", userId: "123" });
+  const mdwResult = await uploadable._def.middleware(badReqMock, { files: [] });
+  expect(mdwResult).toEqual({ metadata: { header1: "woohoo", userId: "123" } });
 });

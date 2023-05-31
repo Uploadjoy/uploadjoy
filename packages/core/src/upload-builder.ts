@@ -4,59 +4,64 @@ import type {
   UploadBuilderDef,
   Uploader,
   AnyRuntime,
+  FileRouterInputConfig,
 } from "./types";
 
-export function createBuilder<TRuntime extends AnyRuntime = "web">(
+function internalCreateBuilder<TRuntime extends AnyRuntime = "web">(
   initDef: Partial<UploadBuilderDef<TRuntime>> = {},
 ): UploadBuilder<{
   _metadata: UnsetMarker;
   _runtime: TRuntime;
 }> {
   const _def: UploadBuilderDef<TRuntime> = {
-    fileTypes: { "image/*": ["*"] },
-    maxSize: "1MB",
+    // Default router config
+    routerConfig: {
+      image: {
+        maxFileSize: "4MB",
+      },
+    },
     access: "public",
-    // @ts-expect-error - huh?
+
+    // @ts-expect-error - Ignore the temp middleware
     middleware: () => ({}),
+
+    // Overload with properties passed in
     ...initDef,
   };
 
   return {
-    fileTypes(types) {
-      return createBuilder({
-        ..._def,
-        fileTypes: types,
-      });
-    },
-    maxSize(size) {
-      return createBuilder({
-        ..._def,
-        maxSize: size,
-      });
-    },
     access(access) {
-      return createBuilder({
+      return internalCreateBuilder({
         ..._def,
         access,
       });
     },
-    maxFiles(maxFiles) {
-      return createBuilder({
+    middleware(userMiddleware) {
+      return internalCreateBuilder({
         ..._def,
-        maxFiles,
-      });
-    },
-    middleware(resolver) {
-      return createBuilder({
-        ..._def,
-        middleware: resolver,
+        middleware: userMiddleware,
       }) as UploadBuilder<{ _metadata: any; _runtime: TRuntime }>;
     },
-    onUploadComplete(resolver) {
+    onUploadComplete(userUploadComplete) {
       return {
         _def,
-        resolver,
+        resolver: userUploadComplete,
       } as Uploader<{ _metadata: any; _runtime: TRuntime }>;
     },
+  };
+}
+
+type InOut<TRuntime extends AnyRuntime = "web"> = (
+  input: FileRouterInputConfig,
+) => UploadBuilder<{
+  _metadata: UnsetMarker;
+  _runtime: TRuntime;
+}>;
+
+export function createBuilder<
+  TRuntime extends AnyRuntime = "web",
+>(): InOut<TRuntime> {
+  return (input: FileRouterInputConfig) => {
+    return internalCreateBuilder<TRuntime>({ routerConfig: input });
   };
 }

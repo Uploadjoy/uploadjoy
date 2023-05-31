@@ -43,10 +43,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "zod": "^3.21.4"
+    "zod": "^3.21.4",
+    "mime-types": "^2.1.35"
   },
   "devDependencies": {
     "@types/node": "18.16.0",
+    "@types/mime-types": "2.1.1",
     "eslint-config-custom": "workspace:*",
     "eslint": "^8.40.0",
     "next": "13.4.1",
