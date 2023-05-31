@@ -68,6 +68,15 @@ importers:
 
   common/tsconfig: {}
 
+  common/tsup:
+    devDependencies:
+      '@types/node':
+        specifier: 18.16.0
+        version: 18.16.0
+      tsup:
+        specifier: 6.7.0
+        version: 6.7.0(typescript@4.9.5)
+
   docs:
     dependencies:
       '@headlessui/react':
@@ -328,6 +337,9 @@ importers:
       '@types/node':
         specifier: 18.16.0
         version: 18.16.0
+      '@uploadjoy/tsup-config':
+        specifier: workspace:*
+        version: link:../../common/tsup
       eslint:
         specifier: ^8.40.0
         version: 8.41.0
@@ -365,6 +377,9 @@ importers:
       '@uploadjoy/core':
         specifier: ^1.0.0
         version: link:../core
+      '@uploadjoy/tsup-config':
+        specifier: workspace:*
+        version: link:../../common/tsup
       eslint:
         specifier: ^7.32.0
         version: 7.32.0

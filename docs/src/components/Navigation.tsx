@@ -208,6 +208,14 @@ export const navigation = [
       { title: "Multipart Uploads", href: "/client/multipartUploads" },
     ],
   },
+  {
+    title: "API Reference",
+    links: [
+      { title: "@uploadjoy/core", href: "/api-reference/core" },
+      { title: "@uploadjoy/react", href: "/api-reference/react" },
+      { title: "@uploadjoy/api-client", href: "/api-reference/api-client" },
+    ],
+  },
 ];
 
 export function Navigation(props: any) {

@@ -1,10 +1,14 @@
 import { defineConfig } from "tsup";
 
-export default defineConfig({
+import { config } from "@uploadjoy/tsup-config";
+
+export default defineConfig((opts) => ({
+  ...config,
   entry: ["./hooks.ts"],
-  splitting: false,
-  sourcemap: true,
-  clean: true,
-  dts: true,
-  format: ["esm"],
-});
+  clean: !opts.watch,
+  esbuildOptions: (option) => {
+    option.banner = {
+      js: `"use client";`,
+    };
+  },
+}));
