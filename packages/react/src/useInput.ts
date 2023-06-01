@@ -258,6 +258,7 @@ const useInput = <TRouter extends void | FileRouter = void>({
     // get the MIME types from the config
     const mimeTypes = [];
     for (const value of Object.values(config)) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore TODO: fix this, acceptedFiles is not defined for blob
       const { acceptedFiles } = value;
       mimeTypes.push(...(acceptedFiles as string[]));
