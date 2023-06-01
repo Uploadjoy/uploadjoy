@@ -6,9 +6,4 @@ export default defineConfig((opts) => ({
   ...config,
   entry: ["./hooks.ts"],
   clean: !opts.watch,
-  esbuildOptions: (option) => {
-    option.banner = {
-      js: `"use client";`,
-    };
-  },
 }));
