@@ -2,7 +2,22 @@
   "name": "@uploadjoy/react",
   "version": "1.0.0",
   "license": "MIT",
-  "type": "module",
+  "exports": {
+    "./hooks": {
+      "import": "./dist/hooks.mjs",
+      "types": "./dist/hooks.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
+    }
+  },
   "scripts": {
     "lint": "eslint *.ts*",
     "build": "tsup",
