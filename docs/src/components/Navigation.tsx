@@ -194,10 +194,8 @@ export const navigation = [
   {
     title: "Next.js",
     links: [
-      { title: "Setup", href: "/nextjs/setup" },
-      { title: "@uploadjoy/next/client", href: "/nextjs/client" },
-      { title: "@uploadjoy/next/server", href: "/nextjs/server" },
-      // { title: "App directory beta", href: "/nextjs/appDirectory" },
+      { title: "App Router (/app)", href: "/nextjs/app" },
+      { title: "Pages Router (/pages)", href: "/nextjs/pages" },
     ],
   },
   {
@@ -206,6 +204,13 @@ export const navigation = [
       { title: "Setup", href: "/client/setup" },
       { title: "Presigned URLs", href: "/client/presignedUrls" },
       { title: "Multipart Uploads", href: "/client/multipartUploads" },
+    ],
+  },
+  {
+    title: "API Reference",
+    links: [
+      { title: "@uploadjoy/core", href: "/api-reference/core" },
+      { title: "@uploadjoy/react", href: "/api-reference/react" },
     ],
   },
 ];

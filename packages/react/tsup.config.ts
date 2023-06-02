@@ -1,10 +1,9 @@
 import { defineConfig } from "tsup";
 
-export default defineConfig({
+import { config } from "@uploadjoy/tsup-config";
+
+export default defineConfig((opts) => ({
+  ...config,
   entry: ["./hooks.ts"],
-  splitting: true,
-  sourcemap: true,
-  clean: true,
-  dts: true,
-  format: ["esm"],
-});
+  clean: !opts.watch,
+}));

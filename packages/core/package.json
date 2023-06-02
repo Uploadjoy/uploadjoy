@@ -43,16 +43,19 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "zod": "^3.21.4"
+    "zod": "^3.21.4",
+    "mime-types": "^2.1.35"
   },
   "devDependencies": {
     "@types/node": "18.16.0",
+    "@types/mime-types": "2.1.1",
     "eslint-config-custom": "workspace:*",
     "eslint": "^8.40.0",
     "next": "13.4.1",
     "tsup": "6.7.0",
     "typescript": "5.1.0-beta",
-    "vitest": "^0.30.1"
+    "vitest": "^0.30.1",
+    "@uploadjoy/tsup-config": "0.1.0"
   },
   "publishConfig": {
     "access": "public"

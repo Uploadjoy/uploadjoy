@@ -1,0 +1,206 @@
+export const description =
+  "This is the API documentation for getting started with Uploadjoy and Next.js's pages router.";
+
+# Next.js - Pages Router
+
+This is the API documentation for getting started with Uploadjoy and Next.js's pages router. This page will walk you through setting up a file router and upload component for your Next.js app.
+
+## 1. Install dependencies
+
+Assuming you already have a Next.js app set up, install the Uploadjoy dependencies:
+
+```bash
+pnpm install @uploadjoy/core @uploadjoy/react
+```
+
+## 2. Change Next.js config
+
+In your `next.config.js` file, add the following:
+
+```js
+const nextConfig = {
+  // ...
+  transpilePackages: ["@uploadjoy/core", "@uploadjoy/react"],
+  experimental: {
+    esmExternals: true,
+  },
+  // ...
+};
+
+module.exports = nextConfig;
+```
+
+## 3. Create a file router
+
+An Uploadjoy file router defines what files can be uploaded to your app, what metadata is associated with each file, and more. This is where you define the rules for your app's file uploads, so there is a lot to cover.
+
+Create a file router in `src/server/uploadjoy.ts`:
+
+```ts
+/** src/server/uploadjoy.ts */
+import { createUploadjoy, type FileRouter } from "@uploadjoy/core/next-legacy";
+
+const f = createUploadjoy();
+
+export const fileRouter = {
+  imageRoute: f({
+    image: {
+      maxFileSize: "8MB",
+      acceptedFiles: ["image/png", "image/jpeg"],
+      maxFileCount: 1,
+    },
+  })
+    .access("private")
+    .middleware(async (req, ctx) => {
+      const filesToUpload = ctx.files;
+
+      // example user authentication
+      const user = await auth(req);
+      const userId = user.id;
+
+      return { metadata: { userId }, folder: `${userId}/images` };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      console.log("Upload complete for user: ", metadata.userId);
+      console.log("File URL: ", file.url);
+    }),
+} satisfies FileRouter;
+
+export type OurFileRouter = typeof uploadRouter;
+```
+
+Let's break down what's happening here:
+
+First, we create a `fileRouter` with an `imageRoute` property (You can name this property whatever you want.)
+
+Next, we define the rules for the `imageRoute`:
+
+```ts
+f({
+  image: {
+    maxFileSize: "8MB",
+    acceptedFiles: ["image/png", "image/jpeg"],
+    maxFileCount: 1,
+  },
+});
+```
+
+This tells Uploadjoy that the `imageRoute` accepts a single image file with a maximum size of 8MB. The `acceptedFiles` property is an array of [MIME types](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types) that are allowed to be uploaded. In this case, we only allow PNG and JPEG images. If the router receives a file that does not match these rules, it will throw an error.
+
+Next, we set the access level for files uploaded to this route:
+
+```ts
+.access("private");
+```
+
+Files uploaded to Uploadjoy can be either `public` or `private`. Public files are accessible to anyone with the file's URL, and they are distributed via a CDN. Private files are only accessible via a presigned URL, and they are stored in a private S3 bucket. In this case, we want to keep our images private.
+
+Next, we define a middleware function:
+
+```ts
+.middleware(async (req) => {
+
+  // example user authentication
+  const user = await auth(req);
+  const userId = user.id;
+
+  return { metadata: { userId }, folder: `${userId}/images` };
+});
+```
+
+Middleware can be used to perform any work prior to upload. Here, we authenticate the request and get a user ID. We then return an object with two properties, `metadata` and `folder`.
+
+`metadata` can be any JSON object with data you want to associate with the file. This data will be available in the `onUploadComplete` callback later on.
+
+`folder` is a string that defines the folder where the file will be stored. In this case, we want to store the file in a folder named after the user's ID.
+
+<Warn>
+  The name of your Uploadjoy project associated with your API key will be
+  prepended to the `folder` you return from middleware.
+
+e.g. if you project's name is "my-app", files uploaded to the `imageRoute` will be stored in the folder `my-app/{userId}/images` in our S3 bucket.
+
+</Warn>
+
+Finally, we define an `onUploadComplete` callback:
+
+```ts
+.onUploadComplete(async ({ metadata, file }) => {
+  console.log("Upload complete for user: ", metadata.userId);
+  console.log("File URL: ", file.url);
+}),
+```
+
+`onUploadComplete` is an endpoint called after a file is successfully uploaded. It receives an object with two properties, `metadata` and `file`. `metadata` is the same object we returned from middleware, and `file` is an object with information about the uploaded file, including a URL to access it.
+
+In production, `onUploadComplete` is called by Uploadjoy's servers. In development, it is simulated by your local server.
+
+See the [API reference](/api-reference/core) for all the available options for file routers.
+
+## 4. Create the API endpoint
+
+With our file router defined, we can now create an API endpoint that our frontend will call to communicate with Uploadjoy.
+
+<Note>
+  The API route **must** be located in `pages/api/uploadjoy.ts`. This is because
+  Uploadjoy expects this route to be available to handle the `onUploadComplete`
+  call.
+</Note>
+
+```ts
+/** pages/api/uploadjoy.ts */
+import { createNextPageApiHandler } from "@uploadjoy/core/next-legacy";
+import { fileRouter } from "@/server/uploadjoy";
+
+const handler = createNextPageApiHandler({
+  router: fileRouter,
+});
+
+export default handler;
+```
+
+## 5. Create an upload component using the file router
+
+The `@uploadjoy/react` package provides a `useInput` hook for creating a file input component. It handled calling your backend and provides a function to upload files directly to S3.
+
+```tsx
+import { useInput } from "@uploadjoy/react/hooks";
+import type { OurFileRouter } from "@/server/uploadjoy";
+
+export default function Home() {
+  const { getInputProps, openFileDialog, upload } = useInput<OurFileRouter>({
+    endpoint: "imageRoute",
+    clientCallbacks: {
+      onUploadSuccess: (ctx) => {
+        console.log(ctx);
+      },
+    },
+  });
+
+  return (
+    <>
+      <input {...getInputProps()} />
+      <button
+        onClick={openFileDialog}
+        className="m-2 rounded-md bg-indigo-700 p-2"
+      >
+        Pick Files
+      </button>
+      <button
+        onClick={() => upload()}
+        className="m-2 rounded-md bg-slate-700 p-2"
+      >
+        Upload
+      </button>
+    </>
+  );
+}
+```
+
+Using `useInput` is straightforward. It returns a function for generating props for a file input, a function for opening the file dialog, and a function for uploading files, among other things. You can then use these functions to create your own custom file input component and upload UI.
+
+`useInput` accepts a generic type parameter that defines the type of your file router. In this case, we pass in `OurFileRouter`, which is the type of our `fileRouter` object. The generic is required to ensure that the `endpoint` property is set to a valid endpoint.
+
+For more information on `useInput`, see the [API reference](/api-reference/react).
+
+For a working example, see the Pages Router [example app](https://github.com/Uploadjoy/uploadjoy/tree/main/examples/pagedir).

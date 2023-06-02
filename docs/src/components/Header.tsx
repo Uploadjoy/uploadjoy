@@ -47,8 +47,8 @@ export const Header = forwardRef<HTMLDivElement, { className?: string }>(
           !isInsideMobileNavigation &&
             "backdrop-blur-sm dark:backdrop-blur lg:left-72 xl:left-80",
           isInsideMobileNavigation
-            ? "bg-white dark:bg-zinc-900"
-            : "bg-white/[var(--bg-opacity-light)] dark:bg-zinc-900/[var(--bg-opacity-dark)]"
+            ? "bg-white dark:bg-zinc-950"
+            : "bg-white/[var(--bg-opacity-light)] dark:bg-zinc-950/[var(--bg-opacity-dark)]"
         )}
         style={
           {

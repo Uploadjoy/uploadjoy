@@ -49,7 +49,7 @@ jobs:
 
       - name: Authenticate to npm and publish
         run: |
-          pnpm build --filter @uploadjoy/react --filter uploadjoy --filter @uploadjoy/core --filter @uploadjoy/api-client
+          pnpm build --filter @uploadjoy/react --filter @uploadjoy/core --filter @uploadjoy/api-client
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
           pnpm publish packages/api-client --access public --tag canary --no-git-checks
           pnpm publish packages/react --access public --tag canary --no-git-checks

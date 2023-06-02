@@ -2,7 +2,22 @@
   "name": "@uploadjoy/react",
   "version": "1.0.0",
   "license": "MIT",
-  "type": "module",
+  "exports": {
+    "./hooks": {
+      "import": "./dist/hooks.mjs",
+      "types": "./dist/hooks.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
+    }
+  },
   "scripts": {
     "lint": "eslint *.ts*",
     "build": "tsup",
@@ -16,12 +31,13 @@
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "@types/wicg-file-system-access": "^2020.9.5",
-    "eslint": "^7.32.0",
+    "eslint": "^8.40.0",
     "eslint-config-custom": "workspace:*",
     "react": "^18.2.0",
     "tsup": "6.7.0",
-    "typescript": "^4.5.2",
-    "@uploadjoy/core": "^1.0.0"
+    "typescript": "5.1.0-beta",
+    "@uploadjoy/core": "^1.0.0",
+    "@uploadjoy/tsup-config": "0.1.0"
   },
   "peerDependencies": {
     "react": "^17.0.2 || ^18.0.0",

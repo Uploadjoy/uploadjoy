@@ -1,0 +1,134 @@
+export const description =
+  "This is the API reference documentation for the @uploadjoy/react package.";
+
+# @uploadjoy/react
+
+The @uploadjoy/react package contains the hooks and components for building upload UIs with React.
+
+## useInput
+
+The `useInput` hook is a React hook that provides a helpers and configuration for building a [file input](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file) component.
+
+### Basic Usage
+
+Assuming you have a file router set up, you can use the `useInput` hook to build a file input component.
+
+```tsx
+import { useInput } from "@uploadjoy/react/hooks";
+import type { OurFileRouter } from "@/server/uploadjoy";
+
+export function MyComponent() {
+  const { getInputProps, openFileDialog, upload } = useInput<OurFileRouter>({
+    endpoint: "imageUploader",
+    clientCallbacks: {
+      onUploadSuccess: (ctx) => {
+        console.log(ctx);
+      },
+    },
+  });
+
+  return (
+    <>
+      <input {...getInputProps()} />
+      <button
+        onClick={openFileDialog}
+        className="m-2 rounded-md bg-indigo-700 p-2"
+      >
+        Pick Files
+      </button>
+      <button
+        onClick={() => upload()}
+        className="m-2 rounded-md bg-slate-700 p-2"
+      >
+        Upload
+      </button>
+    </>
+  );
+}
+```
+
+<Warn>
+  You must provide the type of your file router to the generic type parameter of
+  the `useInput` hook. This is used to provide type safety.
+</Warn>
+
+### Configuration
+
+The `useInput` hook accepts a configuration object with the following properties:
+
+<Row>
+  <Col>
+    <Properties>
+      <Property name="disabled" type="boolean (optional)">
+        Sets the `disabled` attribute on the input element.
+      </Property>
+      <Property name="onFileDialogCancel" type="() => void; (optional)">
+        Function to call when the file dialog is cancelled.
+      </Property>
+      <Property name="onFileDialogOpen" type="() => void; (optional)">
+        Function to call when the file dialog is opened.
+      </Property>
+      <Property
+        name="onFileDialogError"
+        type="(error: Error) => void; (optional)"
+      >
+        Function to call when the file dialog encounters an error.
+      </Property>
+      <Property name="endpoint" type="string (required)">
+        The name of a route configured in the file router to use for the upload. If you correctly provided the type of your file router to the generic type parameter of the `useInput` hook, this will be type checked against the routes you configured.
+      </Property>
+      <Property name="clientCallbacks" type="ClientCallbacks (optional)">
+        An object containing callbacks to be called on the client. See the type definitions below for more information.
+
+        ```ts
+        type ClientOnUploadCallback = (input: {
+          file: File;
+          access: "private" | "public";
+        }) => Promise<void> | void;
+
+        type ClientOnUploadFailureCallback = (input: {
+          file: File;
+          access: "private" | "public";
+        }) => Promise<void> | void;
+
+        type ClientOnUploadProgressCallback = (input: {
+          file: File;
+          access: "private" | "public";
+          uploadProgress: Pick<ProgressEvent, "loaded" | "total">;
+        }) => Promise<void> | void;
+
+        type ClientCallbacks = {
+          onUpload?: ClientOnUploadCallback;
+          onUploadFailure?: ClientOnUploadFailureCallback;
+          onUploadProgress?: ClientOnUploadProgressCallback;
+        };
+        ```
+      </Property>
+    </Properties>
+
+  </Col>
+</Row>
+
+### Returns
+
+The `useInput` hook returns an object with the following properties:
+
+<Row>
+  <Col>
+    <Properties>
+      <Property name="getInputProps" type="function">
+        Returns an object containing the props to be spread on the input
+        element.
+      </Property>
+      <Property name="openFileDialog" type="() => void">
+        Opens the file dialog.
+      </Property>
+      <Property name="upload" type="() => Promise<void>">
+        Uploads the selected files.
+      </Property>
+      <Property name="reset" type="() => void">
+        Resets the input element.
+      </Property>
+    </Properties>
+  </Col>
+</Row>

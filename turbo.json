@@ -1,6 +1,9 @@
 {
   "pipeline": {
     "clean": {},
+    "prebuild": {
+      "outputs": ["dist/**"]
+    },
     "build": {
       "outputs": ["dist/**", ".next/**"],
       "dependsOn": ["^build"]
@@ -18,7 +21,9 @@
     "dev": {
       "cache": false
     },
-    "typecheck": {},
+    "typecheck": {
+      "dependsOn": ["^build"]
+    },
     "test": {}
   }
 }

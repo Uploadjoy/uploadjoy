@@ -1,0 +1,158 @@
+export const description =
+  "This is the API reference documentation for the @uploadjoy/core package.";
+
+# @uploadjoy/core
+
+The @uploadjoy/core package contains the core logic for integrating Uploadjoy into your application. It contains functionality for defining file routers,
+calling the Uploadjoy API, and handling file uploads.
+
+## `createUploadjoy`
+
+The `createUploadjoy` function is helper for creating an Uploadjoy router. Depending on your application framework, you need to import the appropriate `createUploadjoy` function.
+
+```ts {{title: "Next.js App Router"}}
+import { createUploadjoy, type FileRouter } from "@uploadjoy/core/next";
+
+const f = createUploadjoy();
+```
+
+```ts {{title: "Next.js Pages Router"}}
+import { createUploadjoy, type FileRouter } from "@uploadjoy/core/next-legacy";
+
+const f = createUploadjoy();
+```
+
+## File Routers
+
+File routers are the main way to define how your application handles file uploads. They are created using the `createUploadjoy` function from above.
+
+```ts
+import { createUploadjoy, type FileRouter } from "@uploadjoy/core/next";
+
+const f = createUploadjoy();
+```
+
+`f` is a builder that can be used to define your file router. It takes an object with the following properties:
+
+```ts
+type AllowedFileType =
+  | "image"
+  | "video"
+  | "audio"
+  | "font"
+  | "text"
+  | "model"
+  | "application"
+  | "blob";
+
+type Input = {
+  [TKey in AllowedFileType]: {
+    // 2MB, 4GB, 16KB, etc.
+    maxFileSize?: string;
+    maxFileCount?: number;
+    /**
+     * Specific MIME types to accept. Specifying `${type}/*` takes precedence
+     * over other MIME types, and accepts all types.
+     *
+     * @example ["image/png", "image/jpeg"]
+     * @example ["video/*"]
+     */
+    acceptedFiles?: `${TMime}/${string}`[];
+  };
+};
+```
+
+Usage example:
+
+```ts
+import { createUploadjoy, type FileRouter } from "@uploadjoy/core/next-legacy";
+
+const f = createUploadjoy();
+
+export const fileRouter = {
+  imageUploader: f({
+    image: {
+      maxFileSize: "2MB",
+      maxFileCount: 10,
+      acceptedFiles: ["image/png", "image/jpeg"],
+    },
+  }),
+};
+```
+
+If you want to accept all file types, you can use the `blob` file type:
+
+```ts
+//...
+export const fileRouter = {
+  anyFileUploader: f({
+    blob: {
+      maxFileSize: "2MB",
+      maxFileCount: 1,
+    },
+  }),
+};
+//...
+```
+
+### `middleware`
+
+The `middleware` property is a function that takes in a user-defined function that runs before the file upload. This function can be used to check if the user is authenticated, or if they have the correct permissions to upload files, or any other logic that needs to run before the file upload.
+
+The function has access to the request object and a context, `ctx`, that contains information about the files to be uploaded.
+
+The function should return an object with the following properties:
+
+```ts
+type MiddlewareOutput = {
+  /** metadata stored with the object on upload */
+  metadata?: Record<string, unknown>;
+
+  /** Folder to upload object to. If not set,
+   * the object will be uploaded to the root of your project.
+   *
+   * Folders need not exist prior to upload.
+   * Folders should not end with a trailing slash.
+   *
+   * @example `${userId}/images`
+   *
+   * The S3 key of an object uploaded to
+   * the above example folder would be
+   * `${projectName}/${userId}/images/${fileName}`
+   */
+  folder?: string;
+};
+```
+
+Usage example:
+
+```ts
+//...
+export const fileRouter = {
+  imageUploader: f({
+    image: {},
+  }).middleware(async (req, ctx) => {
+    const filesToUpload = ctx.files;
+    return {
+      metadata: { numFilesInUpload: filesToUpload.length },
+      folder: "images",
+    };
+  }),
+};
+//...
+```
+
+### `onUploadComplete`
+
+`onUploadComplete` is an endpoint called after a file is successfully uploaded. It receives an object with two properties, `metadata` and `file`. `metadata` is the same object we returned from middleware, and `file` is an object with information about the uploaded file, including a URL to access it.
+
+In production, `onUploadComplete` is called by Uploadjoy's servers. In development, it is simulated by your local server.
+
+```ts
+//...
+.onUploadComplete(async ({ metadata, file }) => {
+  console.log("Upload complete for user: ", metadata.userId);
+  console.log("File URL: ", file.url);
+}),
+//...
+```
