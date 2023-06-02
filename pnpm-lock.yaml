@@ -391,10 +391,10 @@ importers:
         version: 18.2.0
       tsup:
         specifier: 6.7.0
-        version: 6.7.0(typescript@4.9.5)
+        version: 6.7.0(typescript@5.1.0-beta)
       typescript:
-        specifier: ^4.5.2
-        version: 4.9.5
+        specifier: 5.1.0-beta
+        version: 5.1.0-beta
 
 packages:
 
