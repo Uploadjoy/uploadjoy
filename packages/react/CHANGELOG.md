@@ -1,5 +1,16 @@
 # @uploadjoy/react
 
+## 2.0.0
+
+### Major Changes
+
+- [#22](https://github.com/Uploadjoy/uploadjoy/pull/22) [`73a28d5`](https://github.com/Uploadjoy/uploadjoy/commit/73a28d5cfc11a04776ed6b045d0b054f5b081de0) Thanks [@nramkissoon](https://github.com/nramkissoon)! - Router and API overhaul
+
+### Patch Changes
+
+- Updated dependencies [[`73a28d5`](https://github.com/Uploadjoy/uploadjoy/commit/73a28d5cfc11a04776ed6b045d0b054f5b081de0)]:
+  - @uploadjoy/core@2.0.0
+
 ## 1.0.0
 
 ### Minor Changes
