@@ -130,7 +130,7 @@ const fileVerificationFailed = (
 };
 
 const generateUploadJoyURL = (path: `/${string}`) => {
-  const host = process.env.CUSTOM_INFRA_URL ?? "https://uploadjoy.com";
+  const host = process.env.CUSTOM_INFRA_URL ?? "https://www.uploadjoy.com";
   return `${host}${path}`;
 };
 
