@@ -338,7 +338,7 @@ importers:
         specifier: 18.16.0
         version: 18.16.0
       '@uploadjoy/tsup-config':
-        specifier: workspace:*
+        specifier: 0.1.0
         version: link:../../common/tsup
       eslint:
         specifier: ^8.40.0
@@ -378,7 +378,7 @@ importers:
         specifier: ^1.0.0
         version: link:../core
       '@uploadjoy/tsup-config':
-        specifier: workspace:*
+        specifier: 0.1.0
         version: link:../../common/tsup
       eslint:
         specifier: ^8.40.0
