@@ -114,13 +114,13 @@ Middleware can be used to perform any work prior to upload. Here, we authenticat
 
 `folder` is a string that defines the folder where the file will be stored. In this case, we want to store the file in a folder named after the user's ID.
 
-<Note>
+<Warn>
   The name of your Uploadjoy project associated with your API key will be
   prepended to the `folder` you return from middleware.
 
 e.g. if you project's name is "my-app", files uploaded to the `imageRoute` will be stored in the folder `my-app/{userId}/images` in our S3 bucket.
 
-</Note>
+</Warn>
 
 Finally, we define an `onUploadComplete` callback:
 

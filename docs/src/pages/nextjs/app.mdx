@@ -141,11 +141,11 @@ See the [API reference](/api-reference/core) for all the available options for f
 
 With our file router defined, we can now create an API endpoint that our frontend will call to communicate with Uploadjoy.
 
-<Note>
+<Warn>
   The API route **must** be located in `app/api/uploadjoy/route.ts`. This is
   because Uploadjoy expects this route to be available to handle the
   `onUploadComplete` call.
-</Note>
+</Warn>
 
 ```ts
 /** app/api/uploadjoy/route.ts */
