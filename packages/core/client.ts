@@ -49,13 +49,13 @@ export const fetchPresignedUrls = async <T extends string>(
 
 const uploadFile = async ({
   file,
-  url,
+  urlData,
   fields,
   access,
   clientCallbacks,
 }: {
   file: File;
-  url: string;
+  urlData: PresignedUrlRequestResponse["urls"][number];
   fields: Record<string, string>;
   access: "public" | "private";
   clientCallbacks?: {
@@ -74,8 +74,15 @@ const uploadFile = async ({
     }
     form.append("file", file);
 
+    const uploadId = urlData.uploadjoyUploadRequestId;
+    form.append(
+      "tagging",
+      `<Tagging><TagSet><Tag><Key>UploadRequestId</Key><Value>${uploadId}</Value></Tag></TagSet></Tagging>`,
+    );
+
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", url, true);
+
+    xhr.open("POST", urlData.url, true);
 
     xhr.upload.onprogress = async (event: ProgressEvent) => {
       if (onUploadProgress)
@@ -166,7 +173,7 @@ export const uploadFiles = async ({
 
     return uploadFile({
       file,
-      url: urlData.url,
+      urlData,
       fields: urlData.fields,
       access,
       clientCallbacks,

@@ -5,7 +5,7 @@
     { "repo": "Uploadjoy/uploadjoy" }
   ],
   "commit": false,
-  "fixed": [["@uploadjoy/core", "@uploadjoy/react", "@uploadjoy/api-client"]],
+  "fixed": [["@uploadjoy/core", "@uploadjoy/react"]],
   "linked": [],
   "access": "public",
   "baseBranch": "main",
