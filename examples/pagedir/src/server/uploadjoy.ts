@@ -4,7 +4,9 @@ const f = createUploadjoy();
 
 export const fileRouter = {
   imageUploader: f({
-    image: {},
+    image: {
+      maxFileSize: "1GB",
+    },
   })
     .middleware(async (req, ctx, res) => {
       const filesToUpload = ctx.files;
