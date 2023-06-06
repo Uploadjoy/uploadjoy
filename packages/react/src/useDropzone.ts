@@ -3,8 +3,8 @@
 import {
   ChangeEventHandler,
   HTMLProps,
-  MouseEventHandler,
   Reducer,
+  SyntheticEvent,
   useCallback,
   useEffect,
   useMemo,
@@ -14,12 +14,14 @@ import {
 import { fromEvent } from "file-selector";
 import {
   composeEventHandlers,
-  canUseFileSystemAccessAPI,
-  isAbort,
-  isSecurityError,
   noop,
   UploaderError,
   noopPromise,
+  isEvtWithFiles,
+  isPropagationStopped,
+  canUseFileSystemAccessAPI,
+  isAbort,
+  isSecurityError,
 } from "./utils";
 import type {
   ClientOnUploadCallback,
@@ -34,15 +36,40 @@ type EndpointHelper<TRouter extends void | FileRouter> = void extends TRouter
   ? "YOU FORGOT TO PASS THE GENERIC"
   : keyof TRouter;
 
-type UseInputOptions<TRouter extends void | FileRouter = void> = {
+function onDocumentDragOver(event: any) {
+  event.preventDefault();
+}
+
+type UseDropzoneOptions<TRouter extends void | FileRouter = void> = {
   /**
    * Sets the `disabled` attribute on the input element.
    * @default false
    */
   disabled?: boolean;
+
   onFileDialogCancel?: () => void;
   onFileDialogOpen?: () => void;
   onFileDialogError?: (error: Error) => void;
+
+  /**
+   * Cb for when the `dragenter` event occurs.
+   */
+  onDragEnter?: (event: DragEvent) => void;
+
+  /**
+   * Cb for when the `dragleave` event occurs
+   */
+  onDragLeave?: (event: DragEvent) => void;
+
+  /**
+   * Cb for when the `dragover` event occurs
+   */
+  onDragOver?: (event: DragEvent) => void;
+
+  /**
+   * Cb for when the `drop` event occurs
+   */
+  onDrop?: (files: File[], event: DragEvent | Event) => void;
 
   endpoint: EndpointHelper<TRouter>;
 
@@ -70,34 +97,37 @@ type InputError =
     }
   | FileRejectionError;
 
-type UseInputPropsState = {
+type UseDropzonePropsState = {
   isFileDialogActive: boolean;
+  isDragActive: boolean;
   isFocused: boolean;
   acceptedFiles: File[];
   errors: InputError[];
   presignedUrls?: Awaited<ReturnType<typeof fetchPresignedUrls>>;
 };
 
-const initialState: UseInputPropsState = {
+const initialState: UseDropzonePropsState = {
   isFileDialogActive: false,
+  isDragActive: false,
   isFocused: false,
   acceptedFiles: [],
   errors: [],
   presignedUrls: undefined,
 };
 
-type UseInputPropsAction = {
+type UseDropzonePropsAction = {
   type:
     | "focus"
     | "blur"
-    | "openDialog"
-    | "closeDialog"
     | "setFiles"
     | "reset"
-    | "setPresignedUrls";
-} & Partial<UseInputPropsState>;
+    | "openDialog"
+    | "closeDialog"
+    | "setPresignedUrls"
+    | "setDragActive";
+} & Partial<UseDropzonePropsState>;
 
-const reducer: Reducer<UseInputPropsState, UseInputPropsAction> = (
+const reducer: Reducer<UseDropzonePropsState, UseDropzonePropsAction> = (
   state,
   action,
 ) => {
@@ -117,6 +147,8 @@ const reducer: Reducer<UseInputPropsState, UseInputPropsAction> = (
       };
     case "closeDialog":
       return { ...state, isFileDialogActive: false };
+    case "setDragActive":
+      return { ...state, isDragActive: action.isDragActive ?? false };
     case "setFiles":
       return {
         ...state,
@@ -139,14 +171,18 @@ const reducer: Reducer<UseInputPropsState, UseInputPropsAction> = (
   }
 };
 
-const useInput = <TRouter extends void | FileRouter = void>({
+const useDropzone = <TRouter extends void | FileRouter = void>({
   disabled = false,
+  clientCallbacks,
+  endpoint,
+  onDragEnter,
+  onDragLeave,
+  onDragOver,
+  onDrop,
   onFileDialogCancel,
   onFileDialogOpen,
   onFileDialogError,
-  clientCallbacks,
-  endpoint,
-}: UseInputOptions<TRouter>) => {
+}: UseDropzoneOptions<TRouter>) => {
   const permittedFileInfo = useEndpointMetadata(endpoint as string);
 
   const { access, config, multiple } = permittedFileInfo ?? {};
@@ -167,6 +203,7 @@ const useInput = <TRouter extends void | FileRouter = void>({
     [onFileDialogCancel],
   );
 
+  const rootRef = useRef<HTMLElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -214,6 +251,81 @@ const useInput = <TRouter extends void | FileRouter = void>({
     [onFileDialogError],
   );
 
+  const dragTargetsRef = useRef([]);
+
+  const onDocumentDrop = (event: any) => {
+    if (rootRef.current && rootRef.current.contains(event.target)) {
+      // If we intercepted an event for our instance, let it propagate down to the instance's onDrop handler
+      return;
+    }
+    event.preventDefault();
+    dragTargetsRef.current = [];
+  };
+
+  useEffect(() => {
+    document.addEventListener("dragover", onDocumentDragOver, false);
+    document.addEventListener("drop", onDocumentDrop, false);
+
+    return () => {
+      document.removeEventListener("dragover", onDocumentDragOver);
+      document.removeEventListener("drop", onDocumentDrop);
+    };
+  }, [rootRef]);
+
+  const onDragEnterCb = useCallback(
+    (event: DragEvent) => {
+      event.preventDefault();
+      (event as unknown as SyntheticEvent).persist();
+
+      dispatch({ type: "setDragActive", isDragActive: true });
+      if (onDragEnter) {
+        onDragEnter(event);
+      }
+    },
+    [onDragEnter],
+  );
+
+  const onDragOverCb = useCallback(
+    (event: DragEvent) => {
+      event.preventDefault();
+      (event as unknown as SyntheticEvent).persist();
+
+      const hasFiles = isEvtWithFiles(event);
+      if (hasFiles && onDragOver) {
+        onDragOver(event);
+      }
+    },
+    [onDragOver],
+  );
+
+  const onDragLeaveCb = useCallback(
+    (event: DragEvent) => {
+      event.preventDefault();
+      (event as unknown as SyntheticEvent).persist();
+      // Only deactivate once the dropzone and all children have been left
+      const targets = dragTargetsRef.current.filter(
+        (target) => rootRef.current && rootRef.current.contains(target),
+      );
+      // Make sure to remove a target present multiple times only once
+      // (Firefox may fire dragenter/dragleave multiple times on the same element)
+
+      const targetIdx = (targets as any[]).indexOf(event.target);
+      if (targetIdx !== -1) {
+        targets.splice(targetIdx, 1);
+      }
+      dragTargetsRef.current = targets;
+      if (targets.length > 0) {
+        return;
+      }
+
+      dispatch({ type: "setDragActive", isDragActive: false });
+      if (isEvtWithFiles(event) && onDragLeave) {
+        onDragLeave(event);
+      }
+    },
+    [rootRef, onDragLeave],
+  );
+
   const setFiles = useCallback(
     async (files: File[]) => {
       const errors: InputError[] = [];
@@ -249,22 +361,6 @@ const useInput = <TRouter extends void | FileRouter = void>({
     },
     [dispatch, multiple],
   );
-
-  const mimeTypesFromConfig = useMemo(() => {
-    if (!config) {
-      return;
-    }
-    // get the MIME types from the config
-    const mimeTypes = [];
-    for (const value of Object.values(config)) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore TODO: fix this, acceptedFiles is not defined for blob
-      const { acceptedFiles } = value;
-      mimeTypes.push(...(acceptedFiles as string[]));
-    }
-
-    return mimeTypes;
-  }, [config]);
 
   // Fn for opening the file dialog programmatically
   const openFileDialog = useCallback(() => {
@@ -352,14 +448,155 @@ const useInput = <TRouter extends void | FileRouter = void>({
     event.stopPropagation();
   }, []);
 
+  const onDropCb = useCallback(
+    (event: any) => {
+      event.preventDefault();
+      // Persist here because we need the event later after getFilesFromEvent() is done
+      event.persist();
+
+      dragTargetsRef.current = [];
+
+      if (isEvtWithFiles(event)) {
+        Promise.resolve(fromEvent(event))
+          .then(async (files) => {
+            if (isPropagationStopped(event)) {
+              return;
+            }
+
+            const acceptedFiles = files.map((file) => {
+              if ((file as DataTransferItem).getAsFile) {
+                const dtFile = (file as DataTransferItem).getAsFile();
+                if (dtFile) {
+                  return dtFile;
+                }
+              }
+
+              return file as File;
+            });
+            await setFiles(acceptedFiles);
+          })
+          .catch((error) => {
+            console.error(error);
+            dispatch({ type: "reset" });
+          });
+      }
+    },
+    [setFiles],
+  );
+
+  // Cb to open the file dialog when SPACE/ENTER occurs on the dropzone
+  const onKeyDownCb = useCallback(
+    (event: any) => {
+      // Ignore keyboard events bubbling up the DOM tree
+      if (!rootRef.current || !rootRef.current.isEqualNode(event.target)) {
+        return;
+      }
+
+      if (
+        event.key === " " ||
+        event.key === "Enter" ||
+        event.keyCode === 32 ||
+        event.keyCode === 13
+      ) {
+        event.preventDefault();
+        openFileDialog();
+      }
+    },
+    [rootRef, openFileDialog],
+  );
+
+  // Update focus state for the dropzone
+  const onFocusCb = useCallback(() => {
+    dispatch({ type: "focus" });
+  }, []);
+  const onBlurCb = useCallback(() => {
+    dispatch({ type: "blur" });
+  }, []);
+
+  const mimeTypesFromConfig = useMemo(() => {
+    if (!config) {
+      return;
+    }
+    // get the MIME types from the config
+    const mimeTypes = [];
+    for (const value of Object.values(config)) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore TODO: fix this, acceptedFiles is not defined for blob
+      const { acceptedFiles } = value;
+      mimeTypes.push(...(acceptedFiles as string[]));
+    }
+
+    return mimeTypes;
+  }, [config]);
+
   // eslint-disable-next-line @typescript-eslint/ban-types
   const composeHandler = (fn: Function) => {
     return disabled ? noop : fn;
   };
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  const composeKeyboardHandler = (fn: Function) => {
+    return composeHandler(fn);
+  };
+
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  const composeDragHandler = (fn: Function) => {
+    return composeHandler(fn);
+  };
+
+  const getRootProps = useMemo(
+    () =>
+      ({
+        refKey = "ref",
+        role,
+        onKeyDown,
+        onFocus,
+        onBlur,
+        onDragEnter,
+        onDragOver,
+        onDragLeave,
+        onDrop,
+        ...rest
+      }: // TODO: fix any cast
+      any = {}) => ({
+        onKeyDown: composeKeyboardHandler(
+          composeEventHandlers(onKeyDown, onKeyDownCb),
+        ),
+        onFocus: composeKeyboardHandler(
+          composeEventHandlers(onFocus, onFocusCb),
+        ),
+        onBlur: composeKeyboardHandler(composeEventHandlers(onBlur, onBlurCb)),
+        onDragEnter: composeDragHandler(
+          composeEventHandlers(onDragEnter, onDragEnterCb),
+        ),
+        onDragOver: composeDragHandler(
+          composeEventHandlers(onDragOver, onDragOverCb),
+        ),
+        onDragLeave: composeDragHandler(
+          composeEventHandlers(onDragLeave, onDragLeaveCb),
+        ),
+        onDrop: composeDragHandler(composeEventHandlers(onDrop, onDropCb)),
+        role: typeof role === "string" && role !== "" ? role : "presentation",
+        [refKey]: rootRef,
+        ...(!disabled ? { tabIndex: 0 } : {}),
+        ...rest,
+      }),
+    [
+      rootRef,
+      onKeyDownCb,
+      onFocusCb,
+      onBlurCb,
+      onDragEnterCb,
+      onDragOverCb,
+      onDragLeaveCb,
+      onDropCb,
+      disabled,
+    ],
+  );
+
   const getInputProps = useMemo(
     () =>
-      ({ onChange, onClick, ...rest }: HTMLProps<HTMLInputElement> = {}) => {
+      ({ onChange, ...rest }: HTMLProps<HTMLInputElement> = {}) => {
         if (!config) {
           return {};
         }
@@ -372,9 +609,6 @@ const useInput = <TRouter extends void | FileRouter = void>({
           onChange: composeHandler(
             composeEventHandlers(onChange ?? noop),
           ) as ChangeEventHandler<HTMLInputElement>,
-          onClick: composeHandler(
-            composeEventHandlers(onClick ?? noop, onInputElementClick),
-          ) as MouseEventHandler<HTMLInputElement>,
           tabIndex: -1,
           ref: inputRef,
         };
@@ -413,10 +647,11 @@ const useInput = <TRouter extends void | FileRouter = void>({
     ...state,
     isFocused: isFocused && !disabled,
     getInputProps,
-    openFileDialog: disabled ? noop : openFileDialog,
+    getDropzoneRootProps: getRootProps,
     upload: disabled ? noopPromise : upload,
+    openFileDialog: disabled ? noop : openFileDialog,
     reset,
   };
 };
 
-export { useInput };
+export { useDropzone };

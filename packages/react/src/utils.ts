@@ -266,6 +266,18 @@ export function acceptPropAsAcceptAttr(
   return attr;
 }
 
+export function isEvtWithFiles(event: any) {
+  if (!event.dataTransfer) {
+    return !!event.target && !!event.target.files;
+  }
+  // https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/types
+  // https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Recommended_drag_types#file
+  return Array.prototype.some.call(
+    event.dataTransfer.types,
+    (type) => type === "Files" || type === "application/x-moz-file",
+  );
+}
+
 /**
  * Check if v is an exception caused by aborting a request (e.g window.showOpenFilePicker()).
  *
