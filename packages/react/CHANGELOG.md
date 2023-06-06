@@ -1,5 +1,11 @@
 # @uploadjoy/react
 
+## 2.3.0
+
+### Minor Changes
+
+- [#29](https://github.com/Uploadjoy/uploadjoy/pull/29) [`39fc40b`](https://github.com/Uploadjoy/uploadjoy/commit/39fc40b26193fb05dafaddd89463c135dfa4b832) Thanks [@nramkissoon](https://github.com/nramkissoon)! - add upload states
+
 ## 2.2.0
 
 ### Minor Changes
