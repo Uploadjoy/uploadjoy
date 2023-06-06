@@ -104,6 +104,8 @@ type UseDropzonePropsState = {
   acceptedFiles: File[];
   errors: InputError[];
   presignedUrls?: Awaited<ReturnType<typeof fetchPresignedUrls>>;
+  readyToUpload: boolean;
+  isUploading: boolean;
 };
 
 const initialState: UseDropzonePropsState = {
@@ -113,6 +115,8 @@ const initialState: UseDropzonePropsState = {
   acceptedFiles: [],
   errors: [],
   presignedUrls: undefined,
+  readyToUpload: false,
+  isUploading: false,
 };
 
 type UseDropzonePropsAction = {
@@ -124,6 +128,8 @@ type UseDropzonePropsAction = {
     | "openDialog"
     | "closeDialog"
     | "setPresignedUrls"
+    | "setIsUploading"
+    | "setDoneUploading"
     | "setDragActive";
 } & Partial<UseDropzonePropsState>;
 
@@ -155,11 +161,23 @@ const reducer: Reducer<UseDropzonePropsState, UseDropzonePropsAction> = (
         acceptedFiles: action.acceptedFiles ?? [],
         errors: action.errors ?? [],
         presignedUrls: action.presignedUrls ?? undefined,
+        readyToUpload: action.readyToUpload ?? false,
       };
     case "setPresignedUrls":
       return {
         ...state,
         presignedUrls: action.presignedUrls ?? undefined,
+      };
+    case "setIsUploading":
+      return {
+        ...state,
+        isUploading: true,
+      };
+    case "setDoneUploading":
+      return {
+        ...state,
+        readyToUpload: false,
+        isUploading: false,
       };
     case "reset":
       return {
@@ -167,6 +185,8 @@ const reducer: Reducer<UseDropzonePropsState, UseDropzonePropsAction> = (
         acceptedFiles: [],
         errors: [],
         presignedUrls: undefined,
+        readyToUpload: false,
+        isUploading: false,
       };
   }
 };
@@ -207,7 +227,13 @@ const useDropzone = <TRouter extends void | FileRouter = void>({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { isFocused, isFileDialogActive, acceptedFiles, presignedUrls } = state;
+  const {
+    isFocused,
+    isFileDialogActive,
+    readyToUpload,
+    acceptedFiles,
+    presignedUrls,
+  } = state;
 
   const fsAccessApiWorksRef = useRef(
     typeof window !== "undefined" &&
@@ -348,6 +374,7 @@ const useDropzone = <TRouter extends void | FileRouter = void>({
           acceptedFiles,
           errors,
           presignedUrls,
+          readyToUpload: true,
           type: "setFiles",
         });
         return;
@@ -356,6 +383,7 @@ const useDropzone = <TRouter extends void | FileRouter = void>({
       dispatch({
         acceptedFiles,
         errors,
+        readyToUpload: false,
         type: "setFiles",
       });
     },
@@ -444,10 +472,6 @@ const useDropzone = <TRouter extends void | FileRouter = void>({
     multiple,
   ]);
 
-  const onInputElementClick = useCallback((event: MouseEvent) => {
-    event.stopPropagation();
-  }, []);
-
   const onDropCb = useCallback(
     (event: any) => {
       event.preventDefault();
@@ -474,6 +498,10 @@ const useDropzone = <TRouter extends void | FileRouter = void>({
               return file as File;
             });
             await setFiles(acceptedFiles);
+
+            if (onDrop) {
+              onDrop(acceptedFiles, event);
+            }
           })
           .catch((error) => {
             console.error(error);
@@ -626,17 +654,21 @@ const useDropzone = <TRouter extends void | FileRouter = void>({
       console.log("No presigned URLs, cannot upload files");
       return;
     }
-    if (access && !disabled) {
-      await uploadFiles({
-        presignedUrls,
-        files: acceptedFiles,
-        clientCallbacks,
-        access,
-      });
+    try {
+      if (access && !disabled && readyToUpload) {
+        dispatch({ type: "setIsUploading" });
+        await uploadFiles({
+          presignedUrls,
+          files: acceptedFiles,
+          clientCallbacks,
+          access,
+        });
+        dispatch({ type: "setDoneUploading" });
+      }
+    } catch (e) {
+      // TODO: better error handling here, just reset for now
+      dispatch({ type: "reset" });
     }
-
-    // TODO: better error handling here, just reset for now
-    dispatch({ type: "reset" });
   }, [acceptedFiles, presignedUrls]);
 
   const reset = useCallback(() => {

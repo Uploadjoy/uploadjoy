@@ -4,14 +4,15 @@ import { useInput } from "@uploadjoy/react/hooks";
 import { OurFileRouter } from "../_uploadjoy";
 
 export const BasicInput = () => {
-  const { getInputProps, openFileDialog, upload } = useInput<OurFileRouter>({
-    endpoint: "imageRoute",
-    clientCallbacks: {
-      onUploadSuccess: (ctx) => {
-        console.log("onUploadSuccess", ctx);
+  const { getInputProps, openFileDialog, upload, readyToUpload, isUploading } =
+    useInput<OurFileRouter>({
+      endpoint: "imageRoute",
+      clientCallbacks: {
+        onUploadSuccess: (ctx) => {
+          console.log("onUploadSuccess", ctx);
+        },
       },
-    },
-  });
+    });
 
   return (
     <div>
@@ -24,12 +25,16 @@ export const BasicInput = () => {
         >
           Pick Files
         </button>
-        <button
-          onClick={() => upload()}
-          className="p-2 rounded-md bg-slate-700 w-fit"
-        >
-          Upload
-        </button>
+
+        {readyToUpload && (
+          <button
+            onClick={() => upload()}
+            className="p-2 rounded-md bg-slate-700 w-fit disabled:bg-slate-400 disabled:cursor-not-allowed"
+            disabled={isUploading}
+          >
+            {isUploading ? "Uploading..." : "Upload"}
+          </button>
+        )}
       </div>
     </div>
   );

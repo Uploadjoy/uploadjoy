@@ -129,6 +129,13 @@ The `useInput` hook returns an object with the following properties:
       <Property name="reset" type="() => void">
         Resets the input element.
       </Property>
+      <Property name="readyToUpload" type="boolean">
+        Whether or not the input element is ready to upload files based on if
+        presigned URLs have been fetched.
+      </Property>
+      <Property name="isUploading" type="boolean">
+        Whether or not files are being uploaded.
+      </Property>
     </Properties>
   </Col>
 </Row>
@@ -282,6 +289,13 @@ The `useDropzone` hook returns an object with the following properties:
       </Property>
       <Property name="reset" type="() => void">
         Resets the input element.
+      </Property>
+      <Property name="readyToUpload" type="boolean">
+        Whether or not the input element is ready to upload files based on if
+        presigned URLs have been fetched.
+      </Property>
+      <Property name="isUploading" type="boolean">
+        Whether or not files are being uploaded.
       </Property>
     </Properties>
   </Col>
