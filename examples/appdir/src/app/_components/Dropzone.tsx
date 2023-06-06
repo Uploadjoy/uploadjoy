@@ -9,8 +9,8 @@ export const Dropzone = () => {
     openFileDialog,
     upload,
     getDropzoneRootProps,
-    presignedUrls,
-    ...rest
+    isUploading,
+    readyToUpload,
   } = useDropzone<OurFileRouter>({
     endpoint: "imageRoute",
     clientCallbacks: {
@@ -19,8 +19,6 @@ export const Dropzone = () => {
       },
     },
   });
-
-  console.log(presignedUrls);
 
   return (
     <div>
@@ -35,12 +33,15 @@ export const Dropzone = () => {
         <input {...getInputProps()} />
       </div>
       <div className="flex gap-4">
-        <button
-          onClick={() => upload()}
-          className="p-2 rounded-md bg-slate-700 w-fit"
-        >
-          Upload
-        </button>
+        {readyToUpload && (
+          <button
+            onClick={() => upload()}
+            className="p-2 rounded-md bg-slate-700 w-fit disabled:bg-slate-400 disabled:cursor-not-allowed"
+            disabled={isUploading}
+          >
+            {isUploading ? "Uploading..." : "Upload"}
+          </button>
+        )}
       </div>
     </div>
   );

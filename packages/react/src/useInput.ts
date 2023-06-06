@@ -76,6 +76,8 @@ type UseInputPropsState = {
   acceptedFiles: File[];
   errors: InputError[];
   presignedUrls?: Awaited<ReturnType<typeof fetchPresignedUrls>>;
+  readyToUpload: boolean;
+  isUploading: boolean;
 };
 
 const initialState: UseInputPropsState = {
@@ -84,6 +86,8 @@ const initialState: UseInputPropsState = {
   acceptedFiles: [],
   errors: [],
   presignedUrls: undefined,
+  readyToUpload: false,
+  isUploading: false,
 };
 
 type UseInputPropsAction = {
@@ -94,7 +98,9 @@ type UseInputPropsAction = {
     | "closeDialog"
     | "setFiles"
     | "reset"
-    | "setPresignedUrls";
+    | "setPresignedUrls"
+    | "setIsUploading"
+    | "setDoneUploading";
 } & Partial<UseInputPropsState>;
 
 const reducer: Reducer<UseInputPropsState, UseInputPropsAction> = (
@@ -123,11 +129,23 @@ const reducer: Reducer<UseInputPropsState, UseInputPropsAction> = (
         acceptedFiles: action.acceptedFiles ?? [],
         errors: action.errors ?? [],
         presignedUrls: action.presignedUrls ?? undefined,
+        readyToUpload: action.readyToUpload ?? false,
       };
     case "setPresignedUrls":
       return {
         ...state,
         presignedUrls: action.presignedUrls ?? undefined,
+      };
+    case "setIsUploading":
+      return {
+        ...state,
+        isUploading: true,
+      };
+    case "setDoneUploading":
+      return {
+        ...state,
+        readyToUpload: false,
+        isUploading: false,
       };
     case "reset":
       return {
@@ -135,6 +153,8 @@ const reducer: Reducer<UseInputPropsState, UseInputPropsAction> = (
         acceptedFiles: [],
         errors: [],
         presignedUrls: undefined,
+        readyToUpload: false,
+        isUploading: false,
       };
   }
 };
@@ -170,7 +190,13 @@ const useInput = <TRouter extends void | FileRouter = void>({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { isFocused, isFileDialogActive, acceptedFiles, presignedUrls } = state;
+  const {
+    isFocused,
+    isFileDialogActive,
+    acceptedFiles,
+    presignedUrls,
+    readyToUpload,
+  } = state;
 
   const fsAccessApiWorksRef = useRef(
     typeof window !== "undefined" &&
@@ -236,6 +262,7 @@ const useInput = <TRouter extends void | FileRouter = void>({
           acceptedFiles,
           errors,
           presignedUrls,
+          readyToUpload: true,
           type: "setFiles",
         });
         return;
@@ -244,6 +271,7 @@ const useInput = <TRouter extends void | FileRouter = void>({
       dispatch({
         acceptedFiles,
         errors,
+        readyToUpload: false,
         type: "setFiles",
       });
     },
@@ -392,17 +420,21 @@ const useInput = <TRouter extends void | FileRouter = void>({
       console.log("No presigned URLs, cannot upload files");
       return;
     }
-    if (access && !disabled) {
-      await uploadFiles({
-        presignedUrls,
-        files: acceptedFiles,
-        clientCallbacks,
-        access,
-      });
+    try {
+      if (access && !disabled && readyToUpload) {
+        dispatch({ type: "setIsUploading" });
+        await uploadFiles({
+          presignedUrls,
+          files: acceptedFiles,
+          clientCallbacks,
+          access,
+        });
+        dispatch({ type: "setDoneUploading" });
+      }
+    } catch (e) {
+      // TODO: better error handling here, just reset for now
+      dispatch({ type: "reset" });
     }
-
-    // TODO: better error handling here, just reset for now
-    dispatch({ type: "reset" });
   }, [acceptedFiles, presignedUrls]);
 
   const reset = useCallback(() => {
