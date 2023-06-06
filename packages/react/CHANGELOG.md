@@ -1,5 +1,11 @@
 # @uploadjoy/react
 
+## 2.2.0
+
+### Minor Changes
+
+- [#27](https://github.com/Uploadjoy/uploadjoy/pull/27) [`b36bffa`](https://github.com/Uploadjoy/uploadjoy/commit/b36bffaf4b270654102009a1689e0e3a05338d15) Thanks [@nramkissoon](https://github.com/nramkissoon)! - Add dropzone hook
+
 ## 2.1.0
 
 ## 2.0.0
