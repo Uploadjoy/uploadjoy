@@ -61,7 +61,7 @@ importers:
         version: 8.5.0(eslint@7.23.0)
       eslint-config-turbo:
         specifier: latest
-        version: 1.9.3(eslint@7.23.0)
+        version: 1.10.2(eslint@7.23.0)
       eslint-plugin-react:
         specifier: 7.31.8
         version: 7.31.8(eslint@7.23.0)
@@ -377,7 +377,7 @@ importers:
         specifier: ^2020.9.5
         version: 2020.9.5
       '@uploadjoy/core':
-        specifier: ^2.5.0
+        specifier: ^2.5.1
         version: link:../core
       '@uploadjoy/tsup-config':
         specifier: 0.1.0
@@ -3202,13 +3202,13 @@ packages:
       eslint-plugin-turbo: 0.0.7(eslint@8.41.0)
     dev: false
 
-  /eslint-config-turbo@1.9.3(eslint@7.23.0):
-    resolution: {integrity: sha512-QG6jxFQkrGSpQqlFKefPdtgUfr20EbU0s4tGGIuGFOcPuJEdsY6VYZpZUxNJvmMcTGqPgMyOPjAFBKhy/DPHLA==}
+  /eslint-config-turbo@1.10.2(eslint@7.23.0):
+    resolution: {integrity: sha512-BaCnpn2GM0rTFLuTVplqY8n+3ttWcu/vEmfjJ2BNBVmwX6ALZoJQfL26ZW6VucRk0psTUJALeo+aPrf3VKEJXA==}
     peerDependencies:
       eslint: '>6.6.0'
     dependencies:
       eslint: 7.23.0
-      eslint-plugin-turbo: 1.9.3(eslint@7.23.0)
+      eslint-plugin-turbo: 1.10.2(eslint@7.23.0)
     dev: false
 
   /eslint-import-resolver-node@0.3.7:
@@ -3479,8 +3479,8 @@ packages:
       eslint: 8.41.0
     dev: false
 
-  /eslint-plugin-turbo@1.9.3(eslint@7.23.0):
-    resolution: {integrity: sha512-ZsRtksdzk3v+z5/I/K4E50E4lfZ7oYmLX395gkrUMBz4/spJlYbr+GC8hP9oVNLj9s5Pvnm9rLv/zoj5PVYaVw==}
+  /eslint-plugin-turbo@1.10.2(eslint@7.23.0):
+    resolution: {integrity: sha512-Kxsy4zlKLrGkEqZgcAQtu16YqU/g0mV1vYa9/VweF+MSnWWQsEzsJ1qlzTfXV6N9VqGmkuLiyWOA84sRUklOOg==}
     peerDependencies:
       eslint: '>6.6.0'
     dependencies:
