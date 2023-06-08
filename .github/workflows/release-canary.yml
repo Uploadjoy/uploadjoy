@@ -50,7 +50,7 @@ jobs:
       - name: Authenticate to npm and publish
         run: |
           pnpm turbo --filter "./packages/*" build
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_ACCESS_TOKEN }}" > .npmrc
           pnpm publish packages/api-client --access public --tag canary --no-git-checks
           pnpm publish packages/react --access public --tag canary --no-git-checks
           pnpm publish packages/core --access public --tag canary --no-git-checks
