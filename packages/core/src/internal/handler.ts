@@ -13,7 +13,7 @@ import {
   signatureIsValid,
   createSignature,
 } from "../utils";
-import { lookup } from "mime-types";
+import { lookup } from "../mime-types";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const UPLOADJOY_VERSION = require("../../package.json").version as string;
@@ -205,7 +205,7 @@ const conditionalDevServer = async (requestId: string, upSecret: string) => {
     });
 
     // create a "fake" signature for the simulated callback
-    const signature = createSignature(requestId, upSecret);
+    const signature = await createSignature(requestId, upSecret, new Crypto());
 
     // TODO: Check that we "actually hit our endpoint" and throw a loud error if we didn't
     const response = await fetch(callbackUrl, {
@@ -338,6 +338,7 @@ export const buildRequestHandler = <
           reqBody.uploadjoyUploadRequestId,
           webhookSignature,
           upSecret,
+          new Crypto(),
         )
       ) {
         console.error("[UPLOADJOY] Invalid webhook signature");

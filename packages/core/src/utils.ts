@@ -5,7 +5,6 @@ import {
   RouteConfig,
   ExpandedNestedFileRouterConfig,
 } from "./types";
-import { createHmac } from "crypto";
 
 const getDefaultSizeForType = (fileType: AllowedFileType): FileSize => {
   if (fileType === "image") return "4MB";
@@ -61,15 +60,48 @@ export const fillInputRouteConfig = (
   return newConfig as ExpandedNestedFileRouterConfig;
 };
 
-export const signatureIsValid = (
+export const signatureIsValid = async (
   message: string,
   signature: string,
   secret: string,
+  crypto: Crypto,
 ) => {
-  const hash = createHmac("sha256", secret).update(message).digest("base64");
-  return hash === signature;
+  const subtle = crypto.subtle;
+  const key = await subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const sig = await subtle.sign(
+    { name: "HMAC", hash: "SHA-256" },
+    key,
+    new TextEncoder().encode(message),
+  );
+
+  // compare the signatures in base64
+  return signature === Buffer.from(sig).toString("base64");
 };
 
-export const createSignature = (message: string, secret: string) => {
-  return createHmac("sha256", secret).update(message).digest("base64");
+export const createSignature = async (
+  message: string,
+  secret: string,
+  crypto: Crypto,
+) => {
+  const subtle = crypto.subtle;
+  const key = await subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const sig = await subtle.sign(
+    { name: "HMAC", hash: "SHA-256" },
+    key,
+    new TextEncoder().encode(message),
+  );
+
+  return Buffer.from(sig).toString("base64");
 };
