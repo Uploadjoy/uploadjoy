@@ -30,17 +30,17 @@ const MyApp: AppType = ({ Component, pageProps }) => {
       <DefaultSeo
         defaultTitle="Uploadjoy documentation"
         canonical="https://docs.uploadjoy.com"
-        description="Upload and host objects like images and videos with Uploadjoy. It's the fastest way to get static files for your applications to your users."
+        description="S3 if it was good. Upload and object storage and management for the modern web."
         openGraph={{
           type: "website",
           locale: "en_IE",
           url: "https://docs.uploadjoy.com",
           site_name: "Uploadjoy",
           description:
-            "Upload and host objects like images and videos with Uploadjoy. It's the fastest way to get static files for your applications to your users.",
+            "S3 if it was good. Upload and object storage and management for the modern web.",
           images: [
             {
-              url: "https://uploadjoy.com/og.png",
+              url: "https://uploadjoy.com/api/og",
               width: 1200,
               height: 630,
               alt: "Simple object storage and sharing.",
