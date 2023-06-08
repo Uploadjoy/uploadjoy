@@ -1,6 +1,6 @@
 {
   "name": "@uploadjoy/react",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "license": "MIT",
   "exports": {
     "./hooks": {
@@ -36,7 +36,7 @@
     "react": "^18.2.0",
     "tsup": "6.7.0",
     "typescript": "5.1.0-beta",
-    "@uploadjoy/core": "^2.5.0",
+    "@uploadjoy/core": "^2.5.1",
     "@uploadjoy/tsup-config": "0.1.0"
   },
   "peerDependencies": {
