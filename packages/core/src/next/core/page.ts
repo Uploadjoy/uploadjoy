@@ -27,6 +27,7 @@ export const createNextPageApiHandler = <TRouter extends FileRouter>(
     // Get inputs from query and params
     const params = req.query;
     const uploadjoyHook = req.headers["uploadjoy-hook"];
+    const webhookSignature = req.headers["x-uploadjoy-wh-signature"];
     const slug = params["slug"];
     const actionType = params["actionType"];
 
@@ -37,8 +38,13 @@ export const createNextPageApiHandler = <TRouter extends FileRouter>(
       return res.status(400).send("`actionType` must not be an array");
     if (uploadjoyHook && typeof uploadjoyHook !== "string")
       return res.status(400).send("`uploadjoyHook` must not be an array");
+    if (webhookSignature && typeof webhookSignature !== "string")
+      return res
+        .status(400)
+        .send("`x-uploadjoy-wh-signature` must not be an array");
 
     const response = await requestHandler({
+      webhookSignature,
       uploadjoyHook,
       slug,
       actionType,
