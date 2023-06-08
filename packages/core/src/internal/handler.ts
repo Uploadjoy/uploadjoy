@@ -8,14 +8,18 @@ import type {
   RouteConfig,
 } from "../types";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { fillInputRouteConfig as parseAndExpandInputConfig } from "../utils";
+import {
+  fillInputRouteConfig as parseAndExpandInputConfig,
+  signatureIsValid,
+  createSignature,
+} from "../utils";
 import { lookup } from "mime-types";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const UPLOADJOY_VERSION = require("../../package.json").version as string;
 
 const UNITS = ["B", "KB", "MB", "GB"] as const;
-type SizeUnit = (typeof UNITS)[number];
+type SizeUnit = typeof UNITS[number];
 
 export const fileSizeToBytes = (input: string) => {
   const regex = new RegExp(`^(\\d+)(\\.\\d+)?\\s*(${UNITS.join("|")})$`, "i");
@@ -200,6 +204,9 @@ const conditionalDevServer = async (requestId: string, upSecret: string) => {
       access: file.access,
     });
 
+    // create a "fake" signature for the simulated callback
+    const signature = createSignature(requestId, upSecret);
+
     // TODO: Check that we "actually hit our endpoint" and throw a loud error if we didn't
     const response = await fetch(callbackUrl, {
       method: "POST",
@@ -216,6 +223,7 @@ const conditionalDevServer = async (requestId: string, upSecret: string) => {
       }),
       headers: {
         "uploadjoy-hook": "callback",
+        "x-uploadjoy-wh-signature": signature,
       },
     });
     if (isValidResponse(response)) {
@@ -278,6 +286,7 @@ export const buildRequestHandler = <
   opts: RouterWithConfig<TRouter>,
 ) => {
   return async (input: {
+    webhookSignature?: string;
     uploadjoyHook?: string;
     slug?: string;
     actionType?: string;
@@ -289,7 +298,8 @@ export const buildRequestHandler = <
     const isDev = process.env.NODE_ENV === "development";
     const { debug } = config ?? {};
 
-    const { uploadjoyHook, slug, req, res, actionType } = input;
+    const { uploadjoyHook, slug, req, res, actionType, webhookSignature } =
+      input;
     let reqBody;
 
     if ("body" in req && typeof req.body === "string") {
@@ -317,6 +327,23 @@ export const buildRequestHandler = <
     const access = uploadable._def.access;
 
     if (uploadjoyHook && uploadjoyHook === "callback") {
+      // verify the webhook signature
+      if (!upSecret) {
+        throw new Error("No uploadjoy secret found");
+      }
+
+      if (
+        !webhookSignature ||
+        !signatureIsValid(
+          reqBody.uploadjoyUploadRequestId,
+          webhookSignature,
+          upSecret,
+        )
+      ) {
+        console.error("[UPLOADJOY] Invalid webhook signature");
+        return { status: 401 };
+      }
+
       // This is when we receive the webhook from uploadjoy
       await uploadable.resolver({
         file: reqBody.file,

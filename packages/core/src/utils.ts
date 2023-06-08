@@ -5,6 +5,7 @@ import {
   RouteConfig,
   ExpandedNestedFileRouterConfig,
 } from "./types";
+import { createHmac } from "crypto";
 
 const getDefaultSizeForType = (fileType: AllowedFileType): FileSize => {
   if (fileType === "image") return "4MB";
@@ -58,4 +59,17 @@ export const fillInputRouteConfig = (
 
   // we can cast here because we know the config has at least one key
   return newConfig as ExpandedNestedFileRouterConfig;
+};
+
+export const signatureIsValid = (
+  message: string,
+  signature: string,
+  secret: string,
+) => {
+  const hash = createHmac("sha256", secret).update(message).digest("base64");
+  return hash === signature;
+};
+
+export const createSignature = (message: string, secret: string) => {
+  return createHmac("sha256", secret).update(message).digest("base64");
 };

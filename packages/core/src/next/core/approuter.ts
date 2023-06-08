@@ -16,10 +16,13 @@ export const createNextRouteHandler = <TRouter extends FileRouter>(
   const POST = async (req: Request) => {
     const params = new URL(req.url).searchParams;
     const uploadjoyHook = req.headers.get("uploadjoy-hook") ?? undefined;
+    const webhookSignature =
+      req.headers.get("x-uploadjoy-wh-signature") ?? undefined;
     const slug = params.get("slug") ?? undefined;
     const actionType = params.get("actionType") ?? undefined;
 
     const response = await requestHandler({
+      webhookSignature,
       uploadjoyHook,
       slug,
       actionType,
