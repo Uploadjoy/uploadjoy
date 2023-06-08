@@ -626,7 +626,16 @@ const useDropzone = <TRouter extends void | FileRouter = void>({
     () =>
       ({ onChange, ...rest }: HTMLProps<HTMLInputElement> = {}) => {
         if (!config) {
-          return {};
+          return {
+            accept: "",
+            multiple,
+            type: "file",
+            style: { display: "none" },
+            onChange: noop as ChangeEventHandler<HTMLInputElement>,
+            tabIndex: -1,
+            ref: inputRef,
+            ...rest,
+          };
         }
         const acceptAll = "blob" in config;
         const inputProps = {
