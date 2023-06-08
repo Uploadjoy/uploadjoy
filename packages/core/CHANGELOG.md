@@ -1,5 +1,11 @@
 # @uploadjoy/core
 
+## 2.4.0
+
+### Minor Changes
+
+- [#32](https://github.com/Uploadjoy/uploadjoy/pull/32) [`cd653e3`](https://github.com/Uploadjoy/uploadjoy/commit/cd653e38cc03f216640600433d26118e021996f4) Thanks [@nramkissoon](https://github.com/nramkissoon)! - Add webhook verification
+
 ## 2.3.0
 
 ## 2.2.0
