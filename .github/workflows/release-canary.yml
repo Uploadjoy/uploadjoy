@@ -50,7 +50,7 @@ jobs:
       - name: Authenticate to npm and publish
         run: |
           pnpm turbo --filter "./packages/*" build
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_ACCESS_TOKEN }}" > .npmrc
           pnpm publish packages/api-client --access public --tag canary --no-git-checks
           pnpm publish packages/react --access public --tag canary --no-git-checks
           pnpm publish packages/core --access public --tag canary --no-git-checks
@@ -62,7 +62,7 @@ jobs:
           script: |
             // Get package version
             const fs = require("fs");
-            const packageJson = JSON.parse(fs.readFileSync("./packages/api-client/package.json"));
+            const packageJson = JSON.parse(fs.readFileSync("./packages/core/package.json"));
             const version = packageJson.version;
 
             // Create a comment on the PR with the new canary version

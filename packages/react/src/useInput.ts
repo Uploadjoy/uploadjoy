@@ -389,7 +389,17 @@ const useInput = <TRouter extends void | FileRouter = void>({
     () =>
       ({ onChange, onClick, ...rest }: HTMLProps<HTMLInputElement> = {}) => {
         if (!config) {
-          return {};
+          return {
+            accept: "",
+            multiple,
+            type: "file",
+            style: { display: "none" },
+            onChange: noop as ChangeEventHandler<HTMLInputElement>,
+            onClick: noop as MouseEventHandler<HTMLInputElement>,
+            tabIndex: -1,
+            ref: inputRef,
+            ...rest,
+          };
         }
         const acceptAll = "blob" in config;
         const inputProps = {
