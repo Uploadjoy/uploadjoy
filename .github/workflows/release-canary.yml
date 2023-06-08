@@ -62,7 +62,7 @@ jobs:
           script: |
             // Get package version
             const fs = require("fs");
-            const packageJson = JSON.parse(fs.readFileSync("./packages/api-client/package.json"));
+            const packageJson = JSON.parse(fs.readFileSync("./packages/core/package.json"));
             const version = packageJson.version;
 
             // Create a comment on the PR with the new canary version
