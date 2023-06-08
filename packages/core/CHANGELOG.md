@@ -1,5 +1,11 @@
 # @uploadjoy/core
 
+## 2.5.0
+
+### Minor Changes
+
+- [#34](https://github.com/Uploadjoy/uploadjoy/pull/34) [`7674266`](https://github.com/Uploadjoy/uploadjoy/commit/7674266980178a285136e14d2e4525f213d8453e) Thanks [@nramkissoon](https://github.com/nramkissoon)! - make edge compat
+
 ## 2.4.0
 
 ### Minor Changes

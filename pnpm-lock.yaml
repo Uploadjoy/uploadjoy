@@ -377,7 +377,7 @@ importers:
         specifier: ^2020.9.5
         version: 2020.9.5
       '@uploadjoy/core':
-        specifier: ^2.4.0
+        specifier: ^2.5.0
         version: link:../core
       '@uploadjoy/tsup-config':
         specifier: 0.1.0
