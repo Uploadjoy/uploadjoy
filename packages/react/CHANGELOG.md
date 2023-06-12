@@ -1,5 +1,11 @@
 # @uploadjoy/react
 
+## 2.5.1
+
+### Patch Changes
+
+- [#36](https://github.com/Uploadjoy/uploadjoy/pull/36) [`54c9664`](https://github.com/Uploadjoy/uploadjoy/commit/54c96644c14a027be9cdef016d60407bff45f8da) Thanks [@nramkissoon](https://github.com/nramkissoon)! - Fix UI flash
+
 ## 2.5.0
 
 ## 2.4.0
