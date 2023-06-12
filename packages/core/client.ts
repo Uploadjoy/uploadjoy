@@ -51,19 +51,18 @@ const uploadFile = async ({
   file,
   urlData,
   fields,
-  access,
   clientCallbacks,
 }: {
   file: File;
   urlData: PresignedUrlRequestResponse["urls"][number];
   fields: Record<string, string>;
-  access: "public" | "private";
   clientCallbacks?: {
     onUploadProgress?: ClientOnUploadProgressCallback;
     onUploadSuccess?: ClientOnUploadCallback;
     onUploadError?: ClientOnUploadFailureCallback;
   };
 }) => {
+  const access = urlData.access;
   const { onUploadError, onUploadProgress, onUploadSuccess } =
     clientCallbacks ?? {};
 
@@ -133,12 +132,10 @@ const uploadFile = async ({
 
 export const uploadFiles = async ({
   files,
-  access,
   presignedUrls,
   clientCallbacks,
 }: {
   files: File[];
-  access: "public" | "private";
   presignedUrls: PresignedUrlRequestResponse;
   clientCallbacks?: {
     onUploadProgress?: ClientOnUploadProgressCallback;
@@ -175,7 +172,6 @@ export const uploadFiles = async ({
       file,
       urlData,
       fields: urlData.fields,
-      access,
       clientCallbacks,
     });
   });
