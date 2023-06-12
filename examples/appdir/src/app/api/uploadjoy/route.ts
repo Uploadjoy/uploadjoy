@@ -7,5 +7,6 @@ export const { GET, POST } = createNextRouteHandler({
   router: uploadRouter,
   config: {
     debug: true,
+    uploadjoySecret: process.env.UPLOADJOY_SECRET,
   },
 });

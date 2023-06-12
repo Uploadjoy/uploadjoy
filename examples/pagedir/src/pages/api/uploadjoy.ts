@@ -5,6 +5,7 @@ const handler = createNextPageApiHandler({
   router: fileRouter,
   config: {
     debug: true,
+    uploadjoySecret: process.env.UPLOADJOY_SECRET,
   },
 });
 
