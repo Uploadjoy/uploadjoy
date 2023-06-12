@@ -154,6 +154,10 @@ import { createNextRouteHandler } from "@uploadjoy/core/next";
 
 export const { GET, POST } = createNextRouteHandler({
   router: uploadRouter,
+  config: {
+    // Uploadjoy API key
+    uploadjoySecret: process.env.UPLOADJOY_SECRET,
+  },
 });
 ```
 

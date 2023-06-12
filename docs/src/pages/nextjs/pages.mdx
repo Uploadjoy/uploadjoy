@@ -154,6 +154,10 @@ import { fileRouter } from "@/server/uploadjoy";
 
 const handler = createNextPageApiHandler({
   router: fileRouter,
+  config: {
+    // Uploadjoy API key
+    uploadjoySecret: process.env.UPLOADJOY_SECRET,
+  },
 });
 
 export default handler;
