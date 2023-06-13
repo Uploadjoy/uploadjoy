@@ -65,6 +65,7 @@ export type PresignedUrlRequestResponse = {
     fields: Record<string, string>;
     key: string;
     uploadjoyUploadRequestId: string;
+    access: "public" | "private";
   }[];
 };
 

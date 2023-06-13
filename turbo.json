@@ -8,6 +8,9 @@
       "outputs": ["dist/**", ".next/**"],
       "dependsOn": ["^build"]
     },
+    "@uploadjoy/react#build": {
+      "dependsOn": ["@uploadjoy/core#build"]
+    },
     "start": {
       "dependsOn": ["^build"]
     },

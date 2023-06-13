@@ -22,6 +22,7 @@ import {
   canUseFileSystemAccessAPI,
   isAbort,
   isSecurityError,
+  getMimeTypesFromConfig,
 } from "./utils";
 import type {
   ClientOnUploadCallback,
@@ -545,16 +546,7 @@ const useDropzone = <TRouter extends void | FileRouter = void>({
     if (!config) {
       return;
     }
-    // get the MIME types from the config
-    const mimeTypes = [];
-    for (const value of Object.values(config)) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore TODO: fix this, acceptedFiles is not defined for blob
-      const { acceptedFiles } = value;
-      mimeTypes.push(...(acceptedFiles as string[]));
-    }
-
-    return mimeTypes;
+    return getMimeTypesFromConfig(config);
   }, [config]);
 
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -670,7 +662,6 @@ const useDropzone = <TRouter extends void | FileRouter = void>({
           presignedUrls,
           files: acceptedFiles,
           clientCallbacks,
-          access,
         });
         dispatch({ type: "setDoneUploading" });
       }

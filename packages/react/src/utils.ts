@@ -1,3 +1,4 @@
+import { ExpandedNestedFileRouterConfig } from "@uploadjoy/core/server";
 import type { DragEvent, SyntheticEvent } from "react";
 
 type FilenameExtension = `.${string}`;
@@ -332,4 +333,17 @@ export function noop() {}
 
 export function noopPromise() {
   return Promise.resolve();
+}
+
+export function getMimeTypesFromConfig(config: ExpandedNestedFileRouterConfig) {
+  // get the MIME types from the config
+  const mimeTypes = [];
+  for (const value of Object.values(config)) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore TODO: fix this, acceptedFiles is not defined for blob
+    const { acceptedFiles } = value;
+    mimeTypes.push(...(acceptedFiles as string[]));
+  }
+
+  return mimeTypes;
 }

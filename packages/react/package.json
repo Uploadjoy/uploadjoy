@@ -22,6 +22,7 @@
     "lint": "eslint *.ts*",
     "build": "tsup",
     "release": "changeset version",
+    "clean": "git clean -xdf dist node_modules",
     "pub:release": "pnpm build && npm publish --access public"
   },
   "dependencies": {
@@ -41,6 +42,6 @@
   },
   "peerDependencies": {
     "react": "^17.0.2 || ^18.0.0",
-    "@uploadjoy/core": "^2.0.0"
+    "@uploadjoy/core": "^2.5.0"
   }
 }

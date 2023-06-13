@@ -2,6 +2,7 @@ import { Inter } from "next/font/google";
 import { BasicInput } from "./_components/BasicInput";
 import { WithProgress } from "./_components/WithProgress";
 import { Dropzone } from "./_components/Dropzone";
+import { CustomComponentWithHelpers } from "./_components/Custom";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -11,6 +12,7 @@ export default function Home() {
       <BasicInput />
       <WithProgress />
       <Dropzone />
+      <CustomComponentWithHelpers />
     </main>
   );
 }

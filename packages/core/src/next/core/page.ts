@@ -5,6 +5,7 @@ import {
 } from "../../internal/handler";
 import type { FileRouter } from "../../types";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { webcrypto } from "crypto";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-member-access
 const UPLOADJOY_VERSION = require("../../../package.json").version as string;
@@ -50,6 +51,7 @@ export const createNextPageApiHandler = <TRouter extends FileRouter>(
       actionType,
       req,
       res,
+      crypto: webcrypto,
     });
 
     res.status(response.status);

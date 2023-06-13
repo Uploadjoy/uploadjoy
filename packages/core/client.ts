@@ -5,6 +5,7 @@ export type {
   ClientOnUploadCallback,
   ClientOnUploadFailureCallback,
   ClientOnUploadProgressCallback,
+  PresignedUrlRequestResponse,
 } from "./src/types";
 import type {
   PresignedUrlRequestResponse,
@@ -51,19 +52,18 @@ const uploadFile = async ({
   file,
   urlData,
   fields,
-  access,
   clientCallbacks,
 }: {
   file: File;
   urlData: PresignedUrlRequestResponse["urls"][number];
   fields: Record<string, string>;
-  access: "public" | "private";
   clientCallbacks?: {
     onUploadProgress?: ClientOnUploadProgressCallback;
     onUploadSuccess?: ClientOnUploadCallback;
     onUploadError?: ClientOnUploadFailureCallback;
   };
 }) => {
+  const access = urlData.access;
   const { onUploadError, onUploadProgress, onUploadSuccess } =
     clientCallbacks ?? {};
 
@@ -133,12 +133,10 @@ const uploadFile = async ({
 
 export const uploadFiles = async ({
   files,
-  access,
   presignedUrls,
   clientCallbacks,
 }: {
   files: File[];
-  access: "public" | "private";
   presignedUrls: PresignedUrlRequestResponse;
   clientCallbacks?: {
     onUploadProgress?: ClientOnUploadProgressCallback;
@@ -175,7 +173,6 @@ export const uploadFiles = async ({
       file,
       urlData,
       fields: urlData.fields,
-      access,
       clientCallbacks,
     });
   });
@@ -195,3 +192,5 @@ export const generateClientDropzoneAccept = (fileTypes: string[]) => {
   const mimeTypes = generateMimeTypes(fileTypes);
   return Object.fromEntries(mimeTypes.map((type) => [type, []]));
 };
+
+export { GET_DEFAULT_URL as getUploadjoyUrl } from "./src/utils";

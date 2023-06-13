@@ -12,6 +12,7 @@ import {
   fillInputRouteConfig as parseAndExpandInputConfig,
   signatureIsValid,
   createSignature,
+  GET_DEFAULT_URL,
 } from "../utils";
 import { lookup } from "../mime-types";
 
@@ -178,7 +179,11 @@ const withExponentialBackoff = async <T>(
   return null;
 };
 
-const conditionalDevServer = async (requestId: string, upSecret: string) => {
+const conditionalDevServer = async (
+  requestId: string,
+  upSecret: string,
+  crypto: Crypto,
+) => {
   if (process.env.NODE_ENV !== "development") return;
 
   const queryUrl = generateUploadJoyURL(
@@ -205,7 +210,7 @@ const conditionalDevServer = async (requestId: string, upSecret: string) => {
     });
 
     // create a "fake" signature for the simulated callback
-    const signature = await createSignature(requestId, upSecret, new Crypto());
+    const signature = await createSignature(requestId, upSecret, crypto);
 
     // TODO: Check that we "actually hit our endpoint" and throw a loud error if we didn't
     const response = await fetch(callbackUrl, {
@@ -251,14 +256,6 @@ const conditionalDevServer = async (requestId: string, upSecret: string) => {
   throw new Error("File took too long to upload");
 };
 
-const GET_DEFAULT_URL = () => {
-  // TODO: make platform agnostic
-  const vcurl = process.env.VERCEL_URL;
-  if (vcurl) return `https://${vcurl}/api/uploadjoy`; // SSR should use vercel url
-
-  return `http://localhost:${process.env.PORT ?? 3000}/api/uploadjoy`; // dev SSR should use localhost
-};
-
 export type RouterWithConfig<TRouter extends FileRouter> = {
   router: TRouter;
   config?: {
@@ -286,6 +283,7 @@ export const buildRequestHandler = <
   opts: RouterWithConfig<TRouter>,
 ) => {
   return async (input: {
+    crypto: Crypto;
     webhookSignature?: string;
     uploadjoyHook?: string;
     slug?: string;
@@ -298,8 +296,15 @@ export const buildRequestHandler = <
     const isDev = process.env.NODE_ENV === "development";
     const { debug } = config ?? {};
 
-    const { uploadjoyHook, slug, req, res, actionType, webhookSignature } =
-      input;
+    const {
+      uploadjoyHook,
+      slug,
+      req,
+      res,
+      actionType,
+      webhookSignature,
+      crypto,
+    } = input;
     let reqBody;
 
     if ("body" in req && typeof req.body === "string") {
@@ -312,6 +317,7 @@ export const buildRequestHandler = <
       void conditionalDevServer(
         reqBody.uploadRequestId as string,
         upSecret ?? "",
+        crypto,
       );
 
       return { status: 200 };
@@ -338,7 +344,7 @@ export const buildRequestHandler = <
           reqBody.uploadjoyUploadRequestId,
           webhookSignature,
           upSecret,
-          new Crypto(),
+          crypto,
         )
       ) {
         console.error("[UPLOADJOY] Invalid webhook signature");
