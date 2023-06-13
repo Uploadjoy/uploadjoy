@@ -61,7 +61,7 @@ importers:
         version: 8.5.0(eslint@7.23.0)
       eslint-config-turbo:
         specifier: latest
-        version: 1.9.3(eslint@7.23.0)
+        version: 1.10.3(eslint@7.23.0)
       eslint-plugin-react:
         specifier: 7.31.8
         version: 7.31.8(eslint@7.23.0)
@@ -377,7 +377,7 @@ importers:
         specifier: ^2020.9.5
         version: 2020.9.5
       '@uploadjoy/core':
-        specifier: ^2.5.1
+        specifier: ^2.6.0
         version: link:../core
       '@uploadjoy/tsup-config':
         specifier: 0.1.0
@@ -1152,7 +1152,7 @@ packages:
       '@motionone/easing': 10.15.1
       '@motionone/types': 10.15.1
       '@motionone/utils': 10.15.1
-      tslib: 2.4.0
+      tslib: 2.5.3
     dev: false
 
   /@motionone/dom@10.16.2:
@@ -1163,14 +1163,14 @@ packages:
       '@motionone/types': 10.15.1
       '@motionone/utils': 10.15.1
       hey-listen: 1.0.8
-      tslib: 2.4.0
+      tslib: 2.5.3
     dev: false
 
   /@motionone/easing@10.15.1:
     resolution: {integrity: sha512-6hIHBSV+ZVehf9dcKZLT7p5PEKHGhDwky2k8RKkmOvUoYP3S+dXsKupyZpqx5apjd9f+php4vXk4LuS+ADsrWw==}
     dependencies:
       '@motionone/utils': 10.15.1
-      tslib: 2.4.0
+      tslib: 2.5.3
     dev: false
 
   /@motionone/generators@10.15.1:
@@ -1178,7 +1178,7 @@ packages:
     dependencies:
       '@motionone/types': 10.15.1
       '@motionone/utils': 10.15.1
-      tslib: 2.4.0
+      tslib: 2.5.3
     dev: false
 
   /@motionone/types@10.15.1:
@@ -1190,7 +1190,7 @@ packages:
     dependencies:
       '@motionone/types': 10.15.1
       hey-listen: 1.0.8
-      tslib: 2.4.0
+      tslib: 2.5.3
     dev: false
 
   /@next/env@13.0.2:
@@ -2161,12 +2161,12 @@ packages:
     resolution: {integrity: sha512-j2afSsaIENvHZN2B8GOpF566vZ5WVk5opAiMTvWgaQT8DkbOqsTfvNAvHoRGU2zzP8cPoqys+xHTRDWW8L+/BA==}
     dev: true
 
-  /acorn-import-assertions@1.9.0(acorn@8.8.1):
+  /acorn-import-assertions@1.9.0(acorn@8.8.2):
     resolution: {integrity: sha512-cmMwop9x+8KFhxvKrKfPYmN6/pKTYYHBqLa0DfvVZcKMJWNyWLnaqND7dx/qn66R7ewM1UX5XMaDVP5wlVTaVA==}
     peerDependencies:
       acorn: ^8
     dependencies:
-      acorn: 8.8.1
+      acorn: 8.8.2
     dev: false
 
   /acorn-jsx@5.3.2(acorn@7.4.1):
@@ -3202,13 +3202,13 @@ packages:
       eslint-plugin-turbo: 0.0.7(eslint@8.41.0)
     dev: false
 
-  /eslint-config-turbo@1.9.3(eslint@7.23.0):
-    resolution: {integrity: sha512-QG6jxFQkrGSpQqlFKefPdtgUfr20EbU0s4tGGIuGFOcPuJEdsY6VYZpZUxNJvmMcTGqPgMyOPjAFBKhy/DPHLA==}
+  /eslint-config-turbo@1.10.3(eslint@7.23.0):
+    resolution: {integrity: sha512-ggzPfTJfMsMS383oZ4zfTP1zQvyMyiigOQJRUnLt1nqII6SKkTzdKZdwmXRDHU24KFwUfEFtT6c8vnm2VhL0uQ==}
     peerDependencies:
       eslint: '>6.6.0'
     dependencies:
       eslint: 7.23.0
-      eslint-plugin-turbo: 1.9.3(eslint@7.23.0)
+      eslint-plugin-turbo: 1.10.3(eslint@7.23.0)
     dev: false
 
   /eslint-import-resolver-node@0.3.7:
@@ -3479,8 +3479,8 @@ packages:
       eslint: 8.41.0
     dev: false
 
-  /eslint-plugin-turbo@1.9.3(eslint@7.23.0):
-    resolution: {integrity: sha512-ZsRtksdzk3v+z5/I/K4E50E4lfZ7oYmLX395gkrUMBz4/spJlYbr+GC8hP9oVNLj9s5Pvnm9rLv/zoj5PVYaVw==}
+  /eslint-plugin-turbo@1.10.3(eslint@7.23.0):
+    resolution: {integrity: sha512-g3Mnnk7el1FqxHfqbE/MayLvCsYjA/vKmAnUj66kV4AlM7p/EZqdt42NMcMSKtDVEm0w+utQkkzWG2Xsa0Pd/g==}
     peerDependencies:
       eslint: '>6.6.0'
     dependencies:
@@ -7409,8 +7409,8 @@ packages:
       '@webassemblyjs/ast': 1.11.6
       '@webassemblyjs/wasm-edit': 1.11.6
       '@webassemblyjs/wasm-parser': 1.11.6
-      acorn: 8.8.1
-      acorn-import-assertions: 1.9.0(acorn@8.8.1)
+      acorn: 8.8.2
+      acorn-import-assertions: 1.9.0(acorn@8.8.2)
       browserslist: 4.21.7
       chrome-trace-event: 1.0.3
       enhanced-resolve: 5.14.1
