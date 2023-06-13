@@ -1,4 +1,5 @@
 import { BasicInput } from "@/components/BasicInput";
+import { CustomComponentWithHelpers } from "@/components/Custom";
 import { Dropzone } from "@/components/Dropzone";
 import { WithProgress } from "@/components/WithProgress";
 
@@ -8,6 +9,7 @@ export default function Home() {
       <BasicInput />
       <WithProgress />
       <Dropzone />
+      <CustomComponentWithHelpers />
     </main>
   );
 }

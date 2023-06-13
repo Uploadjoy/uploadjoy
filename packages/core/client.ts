@@ -5,6 +5,7 @@ export type {
   ClientOnUploadCallback,
   ClientOnUploadFailureCallback,
   ClientOnUploadProgressCallback,
+  PresignedUrlRequestResponse,
 } from "./src/types";
 import type {
   PresignedUrlRequestResponse,
@@ -191,3 +192,5 @@ export const generateClientDropzoneAccept = (fileTypes: string[]) => {
   const mimeTypes = generateMimeTypes(fileTypes);
   return Object.fromEntries(mimeTypes.map((type) => [type, []]));
 };
+
+export { GET_DEFAULT_URL as getUploadjoyUrl } from "./src/utils";

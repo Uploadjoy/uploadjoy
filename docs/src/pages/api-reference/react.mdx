@@ -300,3 +300,127 @@ The `useDropzone` hook returns an object with the following properties:
     </Properties>
   </Col>
 </Row>
+
+## useUploadjoy
+
+If you want to build a more custom upload component, @uploadjoy/react exposes a `useUploadjoy` hook that provides a lot of the same functionality as the `useInput` and `useDropzone` hooks.
+
+### Basic Usage
+
+Assuming you have a file router set up, you can generate the `useUploadjoy` hook for your file router and use it to build a file input component.
+
+```tsx
+import { generateReactHelpers } from "@uploadjoy/react/hooks";
+import type { OurFileRouter } from "@/server/uploadjoy";
+import { useState } from "react";
+import { PresignedUrlRequestResponse } from "@uploadjoy/core/client";
+
+const { useUploadjoy } = generateReactHelpers<OurFileRouter>();
+
+export const CustomComponentWithHelpers = () => {
+  const [files, setFiles] = useState<File[]>([]);
+  const [presignedUrls, setPresignedUrls] = useState<
+    PresignedUrlRequestResponse | undefined
+  >(undefined);
+
+  const {
+    isUploading,
+    fetchPresignedUrls,
+    startUpload,
+    permittedFileInfo,
+    getMimeTypesFromConfig,
+  } = useUploadjoy({ endpoint: "imageUploader" });
+
+  return (
+    <div>
+      <h2 className="mb-3 text-xl font-medium">
+        Custom Component with Helpers
+      </h2>
+      {permittedFileInfo && (
+        <div>
+          <input
+            type="file"
+            onChange={async (e) => {
+              setFiles(Array.from(e.target.files ?? []));
+              const presignedUrls = await fetchPresignedUrls({
+                files: Array.from(e.target.files ?? []),
+              });
+              setPresignedUrls(presignedUrls);
+            }}
+            accept={getMimeTypesFromConfig(permittedFileInfo.config).join(",")}
+          />
+          {presignedUrls && (
+            <button
+              onClick={() =>
+                startUpload({
+                  presignedUrls,
+                  files,
+                  clientCallbacks: {
+                    onUploadSuccess: (ctx) => {
+                      console.log("onUploadSuccess", ctx);
+                    },
+                  },
+                })
+              }
+              disabled={isUploading}
+            >
+              {isUploading ? "Uploading..." : "Upload"}
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+```
+
+We import `generateReactHelpers` from `@uploadjoy/react/hooks` and provide our file router type as a generic type parameter. This will type check the `useUploadjoy` hook against the routes we configured in our file router.
+
+### Configuration
+
+The `useUploadjoy` hook accepts an object with the following properties:
+
+<Row>
+  <Col>
+    <Properties>
+      <Property name="endpoint" type="string">
+        File router endpoint to use for the upload.
+      </Property>
+    </Properties>
+  </Col>
+</Row>
+
+### Returns
+
+The `useUploadjoy` hook returns an object with the following properties:
+
+<Row>
+  <Col>
+    <Properties>
+      <Property name="fetchPresignedUrls" type="function">
+        A function you can call to fetch presigned URLs for the files you wish
+        to upload.
+      </Property>
+      <Property name="startUpload" type="function">
+        A function you can call to start uploading files.
+      </Property>
+      <Property name="isUploading" type="boolean">
+        Whether or not files are being uploaded.
+      </Property>
+      <Property name="isFetchingPresignedUrls" type="boolean">
+        Whether or not presigned URLs are being fetched.
+      </Property>
+      <Property name="permittedFileInfo" type="PermittedFileInfo">
+        Information about the permitted files and config based on the
+        configured route.
+
+        See [the source](https://github.com/Uploadjoy/uploadjoy/blob/main/packages/react/src/useEndpointMetadata.ts#L4-L10) for more information.
+      </Property>
+      <Property name="getMimeTypesFromConfig" type="function">
+        A helper function you can call to get the mime types from the router config in
+        `permittedFileInfo`.
+      </Property>
+    </Properties>
+
+  </Col>
+</Row>

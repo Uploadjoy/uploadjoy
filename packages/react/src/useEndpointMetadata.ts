@@ -3,7 +3,7 @@
 import useFetch from "./useFetch";
 import type { ExpandedNestedFileRouterConfig } from "@uploadjoy/core/server";
 
-type EndpointMetadata = {
+export type EndpointMetadata = {
   slug: string;
   config: ExpandedNestedFileRouterConfig;
   access: "public" | "private";

@@ -27,6 +27,7 @@ export const createNextRouteHandler = <TRouter extends FileRouter>(
       slug,
       actionType,
       req,
+      crypto: new Crypto(),
     });
     if (response.status === 200) {
       return new Response(JSON.stringify(response.body), {
