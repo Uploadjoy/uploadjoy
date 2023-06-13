@@ -1,5 +1,11 @@
 # @uploadjoy/core
 
+## 2.6.0
+
+### Minor Changes
+
+- [#39](https://github.com/Uploadjoy/uploadjoy/pull/39) [`ef0279d`](https://github.com/Uploadjoy/uploadjoy/commit/ef0279dadbc7404901ca0a2b22df7d867b413668) Thanks [@nramkissoon](https://github.com/nramkissoon)! - add useUploadjoy hook
+
 ## 2.5.1
 
 ## 2.5.0
