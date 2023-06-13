@@ -15,7 +15,8 @@
       "dependsOn": ["^build"]
     },
     "lint": {
-      "outputs": [".eslintcache"]
+      "dependsOn": ["^build"],
+      "outputs": []
     },
     "format": {},
     "format:check": {
@@ -27,6 +28,8 @@
     "typecheck": {
       "dependsOn": ["^build"]
     },
-    "test": {}
+    "test": {
+      "dependsOn": ["build"]
+    }
   }
 }

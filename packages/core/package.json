@@ -43,7 +43,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "zod": "^3.21.4"
+    "zod": "^3.21.4",
+    "@uploadjoy/mime-types": "^0.1.0"
   },
   "devDependencies": {
     "@types/node": "18.16.0",

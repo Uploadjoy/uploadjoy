@@ -4,7 +4,11 @@
 
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   build:
@@ -33,11 +37,5 @@ jobs:
       - name: Install deps (with cache)
         run: pnpm install
 
-      - name: Typecheck
-        run: pnpm typecheck
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Test
-        run: pnpm test
+      - name: Build, lint, test, and typecheck
+        run: pnpm turbo build lint test typecheck
