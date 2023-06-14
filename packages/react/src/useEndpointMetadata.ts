@@ -1,13 +1,10 @@
 "use client";
 
 import useFetch from "./useFetch";
-import type { ExpandedNestedFileRouterConfig } from "@uploadjoy/core/server";
-
-export type EndpointMetadata = {
-  slug: string;
-  config: ExpandedNestedFileRouterConfig;
-  access: "public" | "private";
-}[];
+import type {
+  ExpandedNestedFileRouterConfig,
+  EndpointMetadata,
+} from "@uploadjoy/core/server";
 
 const acceptsMultipleFiles = (config: ExpandedNestedFileRouterConfig) => {
   let totalAccepts = 0;

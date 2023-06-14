@@ -6,13 +6,14 @@ export type {
   ClientOnUploadFailureCallback,
   ClientOnUploadProgressCallback,
   PresignedUrlRequestResponse,
-} from "./src/types";
+  EndpointMetadata,
+} from "./src/internal/types";
 import type {
   PresignedUrlRequestResponse,
   ClientOnUploadCallback,
   ClientOnUploadFailureCallback,
   ClientOnUploadProgressCallback,
-} from "./src/types";
+} from "./src/internal/types";
 
 const createRequestPermsUrl = (config: { url?: string; slug: string }) => {
   const queryParams = `?actionType=upload&slug=${config.slug}`;

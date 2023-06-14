@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createBuilder } from "./upload-builder";
 import { expect, it, expectTypeOf } from "vitest";
 import { NextRequest } from "next/server";
-import { NestedFileRouterConfig } from "./types";
+import { NestedFileRouterConfig } from "./internal/types";
 
 const badReqMock = {
   headers: {

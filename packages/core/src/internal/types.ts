@@ -199,3 +199,9 @@ export type FileRouter<TParams extends AnyParams = AnyParams> = Record<
   string,
   Uploader<TParams>
 >;
+
+export type EndpointMetadata = {
+  slug: string;
+  config: ExpandedNestedFileRouterConfig;
+  access: "public" | "private";
+}[];

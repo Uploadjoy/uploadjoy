@@ -3,7 +3,7 @@ import {
   buildPermissionsInfoHandler,
   buildRequestHandler,
 } from "../../internal/handler";
-import type { FileRouter } from "../../types";
+import type { FileRouter } from "../../internal/types";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { webcrypto } from "crypto";
 

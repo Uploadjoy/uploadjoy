@@ -6,7 +6,7 @@ import type {
   NestedFileRouterConfig,
   AllowedFileType,
   RouteConfig,
-} from "../types";
+} from "./types";
 import type { NextApiRequest, NextApiResponse } from "next";
 import {
   fillInputRouteConfig as parseAndExpandInputConfig,
