@@ -35,6 +35,8 @@
     "eslint-config-custom": "workspace:*",
     "eslint": "^8.42.0",
     "typescript": "5.1.3",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
     "tsup": "6.7.0"
   },
   "publishConfig": {
