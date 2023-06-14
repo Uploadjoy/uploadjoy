@@ -1,5 +1,13 @@
 # @uploadjoy/react
 
+## 2.6.2
+
+### Patch Changes
+
+- [#43](https://github.com/Uploadjoy/uploadjoy/pull/43) [`019caf9`](https://github.com/Uploadjoy/uploadjoy/commit/019caf948ea588a79aee13c2de718fd756bb79c0) Thanks [@nramkissoon](https://github.com/nramkissoon)! - create shared package for types
+
+- [#43](https://github.com/Uploadjoy/uploadjoy/pull/43) [`2c248de`](https://github.com/Uploadjoy/uploadjoy/commit/2c248de4364b2bbf7f89f4fdefc086c0221dfdaf) Thanks [@nramkissoon](https://github.com/nramkissoon)! - refactor types
+
 ## 2.6.1
 
 ### Patch Changes
