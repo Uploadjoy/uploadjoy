@@ -1,11 +1,11 @@
 import type { FileRouter } from "@uploadjoy/core/server";
 // Don't destructure the import of `use` as it might not exist
 import { useState } from "react";
-import { EndpointMetadata } from "./useEndpointMetadata";
 import { useEvent } from "./useEvent";
 import {
   fetchPresignedUrls as _fetchPresignedUrls,
   uploadFiles as _uploadFiles,
+  EndpointMetadata,
 } from "@uploadjoy/core/client";
 import { getMimeTypesFromConfig } from "./utils";
 import useFetch from "./useFetch";

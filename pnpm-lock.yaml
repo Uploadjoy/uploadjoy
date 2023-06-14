@@ -369,6 +369,9 @@ importers:
       '@uploadjoy/mime-types':
         specifier: ^0.1.1
         version: link:../mime-types
+      '@uploadjoy/shared':
+        specifier: ^0.1.0
+        version: link:../shared
       zod:
         specifier: ^3.21.4
         version: 3.21.4
@@ -464,6 +467,43 @@ importers:
       typescript:
         specifier: 5.1.0-beta
         version: 5.1.0-beta
+
+  packages/shared:
+    dependencies:
+      zod:
+        specifier: ^3.21.4
+        version: 3.21.4
+    devDependencies:
+      '@peculiar/webcrypto':
+        specifier: latest
+        version: 1.4.3
+      '@types/node':
+        specifier: 18.16.0
+        version: 18.16.0
+      '@uploadjoy/tsup-config':
+        specifier: 0.1.0
+        version: link:../../common/tsup
+      eslint:
+        specifier: ^8.40.0
+        version: 8.42.0
+      eslint-config-custom:
+        specifier: workspace:*
+        version: link:../../common/eslint-config-custom
+      jsdom:
+        specifier: ^22.1.0
+        version: 22.1.0
+      next:
+        specifier: 13.4.1
+        version: 13.4.1(react-dom@18.2.0)(react@18.2.0)
+      tsup:
+        specifier: 6.7.0
+        version: 6.7.0(typescript@5.1.0-beta)
+      typescript:
+        specifier: 5.1.0-beta
+        version: 5.1.0-beta
+      vitest:
+        specifier: ^0.30.1
+        version: 0.30.1(jsdom@22.1.0)
 
 packages:
 

@@ -1,29 +1,12 @@
 {
-  "name": "@uploadjoy/core",
-  "version": "2.6.1",
+  "name": "@uploadjoy/shared",
+  "version": "0.1.0",
   "license": "MIT",
   "exports": {
     "./package.json": "./package.json",
-    "./client": {
-      "import": "./dist/client.mjs",
-      "types": "./dist/client.d.ts"
-    },
-    "./server": {
-      "import": "./dist/server.mjs",
-      "types": "./dist/server.d.ts",
-      "default": "./dist/server.mjs"
-    },
-    "./next": {
-      "import": "./dist/next.mjs",
-      "types": "./dist/next.d.ts"
-    },
-    "./next-legacy": {
-      "import": "./dist/next-legacy.mjs",
-      "types": "./dist/next-legacy.d.ts"
-    },
-    "./solid-start": {
-      "import": "./dist/solid-start.mjs",
-      "types": "./dist/solid-start.d.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs"
     }
   },
   "files": [
@@ -47,9 +30,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "zod": "^3.21.4",
-    "@uploadjoy/mime-types": "^0.1.1",
-    "@uploadjoy/shared": "^0.1.0"
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@types/node": "18.16.0",

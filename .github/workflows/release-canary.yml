@@ -53,6 +53,7 @@ jobs:
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_ACCESS_TOKEN }}" > .npmrc
           pnpm publish packages/api-client --access public --tag canary --no-git-checks
           pnpm publish packages/mime-types --access public --tag canary --no-git-checks
+          pnpm publish packages/shared --access public --tag canary --no-git-checks
           pnpm publish packages/core --access public --tag canary --no-git-checks
           pnpm publish packages/react --access public --tag canary --no-git-checks
 
