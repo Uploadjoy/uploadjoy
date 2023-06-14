@@ -8,7 +8,7 @@ S3 + Cloudfront while providing good defaults, easy to understand API and DX.
 ### Packages
 
 1. `@uploadjoy/core` (located in `packages/core`) - Core server and client logic.
-2. `@upladjoy/react` (located in `packages/react`) - React hooks and components for building upload UIs.
+2. `@uploadjoy/react` (located in `packages/react`) - React hooks and components for building upload UIs.
 3. `@uploadjoy/api-client` (location in `packages/api-client`) - TypeScript API client for calling Uploadjoy APIs.
 4. `@uploadjoy/mime-types` (located in `packages/mime-types`) - MIME types database ripped from [this package](https://github.com/jshttp/mime-types).
 5. `@uploadjoy/shared` (located in `packages/shared`) - Shared types and utilities between packages in this repo and the [Uploadjoy webapp](https://uploadjoy.com).

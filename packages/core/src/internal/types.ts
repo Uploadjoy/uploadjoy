@@ -1,3 +1,5 @@
+import { ConfigFileTypes } from "@uploadjoy/shared";
+import { PrepareUploadResponse } from "@uploadjoy/shared";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { NextRequest } from "next/server";
 
@@ -28,17 +30,10 @@ type UploadedFile = {
 
 /**
  * Discrete MIME type https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_Types
+ *
  * "blob" is a catch-all for any file type not explicitly supported
  */
-export type AllowedFileType =
-  | "image"
-  | "video"
-  | "audio"
-  | "font"
-  | "text"
-  | "model"
-  | "application"
-  | "blob";
+export type AllowedFileType = ConfigFileTypes;
 
 type FileExtension = `.${string}`;
 
@@ -58,16 +53,7 @@ export type ClientOnUploadProgressCallback = (input: {
   uploadProgress: Pick<ProgressEvent, "loaded" | "total">;
 }) => Promise<void> | void;
 
-export type PresignedUrlRequestResponse = {
-  urls: {
-    uploadType: "standard";
-    url: string;
-    fields: Record<string, string>;
-    key: string;
-    uploadjoyUploadRequestId: string;
-    access: "public" | "private";
-  }[];
-};
+export type PresignedUrlRequestResponse = PrepareUploadResponse;
 
 type PowOf2 = 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128 | 256 | 512 | 1024;
 export type SizeUnit = "B" | "KB" | "MB" | "GB";
