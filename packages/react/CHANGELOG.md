@@ -1,5 +1,11 @@
 # @uploadjoy/react
 
+## 2.6.1
+
+### Patch Changes
+
+- [#41](https://github.com/Uploadjoy/uploadjoy/pull/41) [`ff1bf02`](https://github.com/Uploadjoy/uploadjoy/commit/ff1bf02cb2ee52caaf2fdee52b63c611bc7069aa) Thanks [@nramkissoon](https://github.com/nramkissoon)! - refactor hooks (dry)
+
 ## 2.6.0
 
 ### Minor Changes

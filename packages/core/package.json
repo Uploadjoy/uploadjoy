@@ -1,6 +1,6 @@
 {
   "name": "@uploadjoy/core",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "license": "MIT",
   "exports": {
     "./package.json": "./package.json",
@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "zod": "^3.21.4",
-    "@uploadjoy/mime-types": "^0.1.0"
+    "@uploadjoy/mime-types": "^0.1.1"
   },
   "devDependencies": {
     "@types/node": "18.16.0",
