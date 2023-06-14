@@ -11,6 +11,9 @@
     "@uploadjoy/react#build": {
       "dependsOn": ["@uploadjoy/core#build"]
     },
+    "@uploadjoy/core#build": {
+      "dependsOn": ["@uploadjoy/mime-types#build"]
+    },
     "start": {
       "dependsOn": ["^build"]
     },
