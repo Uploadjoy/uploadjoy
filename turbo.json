@@ -12,7 +12,7 @@
       "dependsOn": ["@uploadjoy/core#build"]
     },
     "@uploadjoy/core#build": {
-      "dependsOn": ["@uploadjoy/mime-types#build"]
+      "dependsOn": ["@uploadjoy/mime-types#build", "@uploadjoy/shared#build"]
     },
     "start": {
       "dependsOn": ["^build"]

@@ -3,7 +3,7 @@ import {
   buildPermissionsInfoHandler,
   buildRequestHandler,
 } from "../../internal/handler";
-import type { FileRouter } from "../../types";
+import type { FileRouter } from "../../internal/types";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-member-access
 const UPLOADJOY_VERSION = require("../../../package.json").version as string;

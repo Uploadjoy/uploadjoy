@@ -6,13 +6,14 @@ export type {
   ClientOnUploadFailureCallback,
   ClientOnUploadProgressCallback,
   PresignedUrlRequestResponse,
-} from "./src/types";
+  EndpointMetadata,
+} from "./src/internal/types";
 import type {
   PresignedUrlRequestResponse,
   ClientOnUploadCallback,
   ClientOnUploadFailureCallback,
   ClientOnUploadProgressCallback,
-} from "./src/types";
+} from "./src/internal/types";
 
 const createRequestPermsUrl = (config: { url?: string; slug: string }) => {
   const queryParams = `?actionType=upload&slug=${config.slug}`;
@@ -56,79 +57,82 @@ const uploadFile = async ({
 }: {
   file: File;
   urlData: PresignedUrlRequestResponse["urls"][number];
-  fields: Record<string, string>;
+  fields?: Record<string, string>;
   clientCallbacks?: {
     onUploadProgress?: ClientOnUploadProgressCallback;
     onUploadSuccess?: ClientOnUploadCallback;
     onUploadError?: ClientOnUploadFailureCallback;
   };
 }) => {
-  const access = urlData.access;
-  const { onUploadError, onUploadProgress, onUploadSuccess } =
-    clientCallbacks ?? {};
+  // TODO: support multipart uploads
+  if (urlData.uploadType === "standard") {
+    const access = urlData.access;
+    const { onUploadError, onUploadProgress, onUploadSuccess } =
+      clientCallbacks ?? {};
 
-  await new Promise<void>((resolve, reject) => {
-    const form = new FormData();
-    for (const name in fields) {
-      form.append(name, fields[name] as string);
-    }
-    form.append("file", file);
-
-    const uploadId = urlData.uploadjoyUploadRequestId;
-    form.append(
-      "tagging",
-      `<Tagging><TagSet><Tag><Key>UploadRequestId</Key><Value>${uploadId}</Value></Tag></TagSet></Tagging>`,
-    );
-
-    const xhr = new XMLHttpRequest();
-
-    xhr.open("POST", urlData.url, true);
-
-    xhr.upload.onprogress = async (event: ProgressEvent) => {
-      if (onUploadProgress)
-        await onUploadProgress({
-          file,
-          access,
-          uploadProgress: {
-            loaded: event.loaded,
-            total: event.total,
-          },
-        });
-    };
-
-    xhr.onerror = async () => {
-      if (onUploadError)
-        await onUploadError({
-          file,
-          access,
-        });
-      reject();
-    };
-
-    xhr.onreadystatechange = async function () {
-      if (xhr.readyState === 4) {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          if (onUploadSuccess)
-            await onUploadSuccess({
-              file,
-              access,
-            });
-          resolve();
-        } else {
-          if (onUploadError)
-            await onUploadError({
-              file,
-              access,
-            });
-          reject();
-        }
+    await new Promise<void>((resolve, reject) => {
+      const form = new FormData();
+      for (const name in fields) {
+        form.append(name, fields[name] as string);
       }
-    };
+      form.append("file", file);
 
-    xhr.send(form);
-  }).catch((e) => {
-    console.error(e);
-  });
+      const uploadId = urlData.uploadjoyUploadRequestId;
+      form.append(
+        "tagging",
+        `<Tagging><TagSet><Tag><Key>UploadRequestId</Key><Value>${uploadId}</Value></Tag></TagSet></Tagging>`,
+      );
+
+      const xhr = new XMLHttpRequest();
+
+      xhr.open("POST", urlData.url, true);
+
+      xhr.upload.onprogress = async (event: ProgressEvent) => {
+        if (onUploadProgress)
+          await onUploadProgress({
+            file,
+            access,
+            uploadProgress: {
+              loaded: event.loaded,
+              total: event.total,
+            },
+          });
+      };
+
+      xhr.onerror = async () => {
+        if (onUploadError)
+          await onUploadError({
+            file,
+            access,
+          });
+        reject();
+      };
+
+      xhr.onreadystatechange = async function () {
+        if (xhr.readyState === 4) {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            if (onUploadSuccess)
+              await onUploadSuccess({
+                file,
+                access,
+              });
+            resolve();
+          } else {
+            if (onUploadError)
+              await onUploadError({
+                file,
+                access,
+              });
+            reject();
+          }
+        }
+      };
+
+      xhr.send(form);
+    }).catch((e) => {
+      console.error(e);
+    });
+  }
 };
 
 export const uploadFiles = async ({
@@ -169,12 +173,15 @@ export const uploadFiles = async ({
       });
     }
 
-    return uploadFile({
-      file,
-      urlData,
-      fields: urlData.fields,
-      clientCallbacks,
-    });
+    // TODO: support multipart uploads
+    if (urlData.uploadType === "standard") {
+      return uploadFile({
+        file,
+        urlData,
+        fields: urlData.fields,
+        clientCallbacks,
+      });
+    }
   });
 
   await Promise.all(uploadPromises);

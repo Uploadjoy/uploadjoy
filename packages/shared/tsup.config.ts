@@ -4,13 +4,9 @@ import { config } from "@uploadjoy/tsup-config";
 
 export default defineConfig((opts) => ({
   ...config,
-  entry: [
-    "./client.ts",
-    "./server.ts",
-    "./next.ts",
-    "./next-legacy.ts",
-    "./validators.ts",
-    "./solid-start.ts",
-  ],
+  entry: ["./index.ts"],
   clean: !opts.watch,
+  async onSuccess() {
+    // void
+  },
 }));

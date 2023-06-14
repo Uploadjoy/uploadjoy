@@ -4,7 +4,7 @@ import {
   FileSize,
   RouteConfig,
   ExpandedNestedFileRouterConfig,
-} from "./types";
+} from "./internal/types";
 
 const getDefaultSizeForType = (fileType: AllowedFileType): FileSize => {
   if (fileType === "image") return "4MB";
