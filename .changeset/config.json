@@ -15,6 +15,7 @@
   },
   "ignore": [
     "@examples/next-pagedir",
-    "@examples/next-appdir"
+    "@examples/next-appdir",
+    "@examples/solid-start"
   ]
 }
