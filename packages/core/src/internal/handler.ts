@@ -14,7 +14,7 @@ import {
   createSignature,
   GET_DEFAULT_URL,
 } from "../utils";
-import { lookup } from "../mime-types";
+import { lookup } from "@uploadjoy/mime-types";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const UPLOADJOY_VERSION = require("../../package.json").version as string;

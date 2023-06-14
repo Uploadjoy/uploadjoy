@@ -5,6 +5,7 @@ const pkgJsonPaths = [
   "packages/core/package.json",
   "packages/react/package.json",
   "packages/api-client/package.json",
+  "packages/mime-types/package.json",
 ];
 try {
   exec("git rev-parse --short HEAD", (err, stdout) => {

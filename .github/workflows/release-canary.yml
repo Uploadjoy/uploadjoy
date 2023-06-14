@@ -52,8 +52,9 @@ jobs:
           pnpm turbo --filter "./packages/*" build
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_ACCESS_TOKEN }}" > .npmrc
           pnpm publish packages/api-client --access public --tag canary --no-git-checks
-          pnpm publish packages/react --access public --tag canary --no-git-checks
+          pnpm publish packages/mime-types --access public --tag canary --no-git-checks
           pnpm publish packages/core --access public --tag canary --no-git-checks
+          pnpm publish packages/react --access public --tag canary --no-git-checks
 
       - name: Create a new comment notifying of the new canary version
         uses: actions/github-script@v6
