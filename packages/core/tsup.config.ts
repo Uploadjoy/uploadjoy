@@ -10,6 +10,7 @@ export default defineConfig((opts) => ({
     "./next.ts",
     "./next-legacy.ts",
     "./validators.ts",
+    "./solid-start.ts",
   ],
   clean: !opts.watch,
 }));

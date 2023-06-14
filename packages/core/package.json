@@ -20,6 +20,10 @@
     "./next-legacy": {
       "import": "./dist/next-legacy.mjs",
       "types": "./dist/next-legacy.d.ts"
+    },
+    "./solid-start": {
+      "import": "./dist/solid-start.mjs",
+      "types": "./dist/solid-start.d.ts"
     }
   },
   "files": [
