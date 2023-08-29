@@ -9,6 +9,7 @@ import { useIsInsideMobileNavigation } from "./MobileNavigation";
 import { useSectionStore } from "./SectionProvider";
 import { Tag } from "./Tag";
 import { remToPx } from "./../lib/remToPx";
+import { navigation } from "../config/navigation";
 
 function useInitialValue(value: any, condition = true) {
   const initialValue = useRef(value).current;
@@ -185,35 +186,6 @@ function NavigationGroup({ group, className }: any) {
     </li>
   );
 }
-
-export const navigation = [
-  {
-    title: "General",
-    links: [{ title: "Introduction", href: "/" }],
-  },
-  {
-    title: "Next.js",
-    links: [
-      { title: "App Router (/app)", href: "/nextjs/app" },
-      { title: "Pages Router (/pages)", href: "/nextjs/pages" },
-    ],
-  },
-  {
-    title: "API Client",
-    links: [
-      { title: "Setup", href: "/client/setup" },
-      { title: "Presigned URLs", href: "/client/presignedUrls" },
-      { title: "Multipart Uploads", href: "/client/multipartUploads" },
-    ],
-  },
-  {
-    title: "API Reference",
-    links: [
-      { title: "@uploadjoy/core", href: "/api-reference/core" },
-      { title: "@uploadjoy/react", href: "/api-reference/react" },
-    ],
-  },
-];
 
 export function Navigation(props: any) {
   return (

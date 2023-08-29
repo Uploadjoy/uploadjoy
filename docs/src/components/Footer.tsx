@@ -2,8 +2,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 
 import { Button } from "./Button";
-import { navigation } from "./Navigation";
 import type { HTMLProps, ReactElement, SVGProps } from "react";
+import { navigation } from "../config/navigation";
 
 // function CheckIcon(props: SVGProps<SVGSVGElement>) {
 //   return (

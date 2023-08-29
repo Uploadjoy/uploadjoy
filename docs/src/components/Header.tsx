@@ -12,6 +12,7 @@ import {
 } from "./MobileNavigation";
 import { useMobileNavigationStore } from "./MobileNavigation";
 import { ModeToggle } from "./ModeToggle";
+import { CommandMenu } from "./CommandMenu";
 
 function TopLevelNavItem({
   href,
@@ -61,7 +62,7 @@ export const Header = forwardRef<HTMLDivElement, { className?: string }>(
           className={clsx(
             "absolute inset-x-0 top-full h-px transition",
             (isInsideMobileNavigation || !mobileNavIsOpen) &&
-              "bg-zinc-900/7.5 dark:bg-white/7.5"
+              "h-[1px] bg-white/10 dark:bg-white/7.5"
           )}
         />
         <div className="flex items-center gap-5 lg:hidden">
@@ -71,6 +72,7 @@ export const Header = forwardRef<HTMLDivElement, { className?: string }>(
           </Link>
         </div>
         <div className="flex w-full items-center justify-end gap-5">
+          <CommandMenu />
           <div className="flex gap-4">
             <ModeToggle />
           </div>
