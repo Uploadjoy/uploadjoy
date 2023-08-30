@@ -2,10 +2,10 @@ import { Router } from "next/router";
 import { MDXProvider } from "@mdx-js/react";
 import { DefaultSeo } from "next-seo";
 import { Inter } from "@next/font/google";
-import PlausibleProvider from "next-plausible";
 import { useMobileNavigationStore } from "../components/MobileNavigation";
 import { Layout } from "../components/Layout";
 import * as mdxComponents from "../components/mdx";
+import { Analytics } from "@vercel/analytics/react";
 
 import { type AppType } from "next/app";
 
@@ -54,13 +54,12 @@ const MyApp: AppType = ({ Component, pageProps }) => {
           font-family: ${inter.style.fontFamily};
         }
       `}</style>
-      <PlausibleProvider domain="docs.uploadjoy.com">
-        <MDXProvider components={mdxComponents as any}>
-          <Layout {...pageProps}>
-            <Component {...pageProps} />
-          </Layout>
-        </MDXProvider>
-      </PlausibleProvider>
+      <MDXProvider components={mdxComponents as any}>
+        <Layout {...pageProps}>
+          <Component {...pageProps} />
+          <Analytics />
+        </Layout>
+      </MDXProvider>
     </>
   );
 };

@@ -128,6 +128,9 @@ importers:
       '@trpc/server':
         specifier: ^10.0.0
         version: 10.0.0
+      '@vercel/analytics':
+        specifier: latest
+        version: 1.0.1
       acorn:
         specifier: ^8.8.1
         version: 8.8.1
@@ -158,9 +161,6 @@ importers:
       next:
         specifier: 13.0.2
         version: 13.0.2(react-dom@18.2.0)(react@18.2.0)
-      next-plausible:
-        specifier: ^3.7.0
-        version: 3.7.0(next@13.0.2)(react-dom@18.2.0)(react@18.2.0)
       next-seo:
         specifier: ^5.15.0
         version: 5.15.0(next@13.0.2)(react-dom@18.2.0)(react@18.2.0)
@@ -3631,6 +3631,10 @@ packages:
     dependencies:
       '@typescript-eslint/types': 5.45.0
       eslint-visitor-keys: 3.4.1
+
+  /@vercel/analytics@1.0.1:
+    resolution: {integrity: sha512-Ux0c9qUfkcPqng3vrR0GTrlQdqNJ2JREn/2ydrVuKwM3RtMfF2mWX31Ijqo1opSjNAq6rK76PwtANw6kl6TAow==}
+    dev: false
 
   /@vitest/expect@0.30.1:
     resolution: {integrity: sha512-c3kbEtN8XXJSeN81iDGq29bUzSjQhjES2WR3aColsS4lPGbivwLtas4DNUe0jD9gg/FYGIteqOenfU95EFituw==}
@@ -7429,18 +7433,6 @@ packages:
 
   /neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
-    dev: false
-
-  /next-plausible@3.7.0(next@13.0.2)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-YQ/b+BcPIZHOsQPB+YkAAzP4l9oELt3qKazPYvuNr5WRHRDknpyIkge4hf6aeuM+Wg4sdxaY7DfbbAUZlgREuw==}
-    peerDependencies:
-      next: ^11.1.0 || ^12.0.0 || ^13.0.0
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-    dependencies:
-      next: 13.0.2(react-dom@18.2.0)(react@18.2.0)
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /next-seo@5.15.0(next@13.0.2)(react-dom@18.2.0)(react@18.2.0):
