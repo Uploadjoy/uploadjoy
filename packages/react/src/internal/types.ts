@@ -54,6 +54,11 @@ export type UseDropzoneOptions<TRouter extends void | FileRouter = void> =
      * Cb for when the `drop` event occurs
      */
     onDrop?: (files: File[], event: DragEvent | Event) => void;
+
+    /**
+     *  Automatically upload files as they are added to dropzone and validated.
+     */
+    autoUpload?: boolean;
   };
 
 export const ErrorCodes = {

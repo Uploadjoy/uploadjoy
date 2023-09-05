@@ -3,6 +3,7 @@ import { BasicInput } from "./_components/BasicInput";
 import { WithProgress } from "./_components/WithProgress";
 import { Dropzone } from "./_components/Dropzone";
 import { CustomComponentWithHelpers } from "./_components/Custom";
+import { DropzoneAutoUpload } from "./_components/DropzoneAutoUpload";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,6 +14,7 @@ export default function Home() {
       <WithProgress />
       <Dropzone />
       <CustomComponentWithHelpers />
+      <DropzoneAutoUpload />
     </main>
   );
 }
