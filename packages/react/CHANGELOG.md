@@ -1,5 +1,11 @@
 # @uploadjoy/react
 
+## 2.7.0
+
+### Minor Changes
+
+- [#53](https://github.com/Uploadjoy/uploadjoy/pull/53) [`b7694d2`](https://github.com/Uploadjoy/uploadjoy/commit/b7694d29e8c711ce904fc1a8005abfa1659e3733) Thanks [@nramkissoon](https://github.com/nramkissoon)! - Add auto-uploading to dropzone
+
 ## 2.6.2
 
 ### Patch Changes
