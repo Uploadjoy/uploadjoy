@@ -105,6 +105,7 @@ const useDropzone = <TRouter extends void | FileRouter = void>({
   onFileDialogCancel,
   onFileDialogOpen,
   onFileDialogError,
+  autoUpload,
 }: UseDropzoneOptions<TRouter>) => {
   const rootRef = useRef<HTMLElement>(null);
 
@@ -128,6 +129,7 @@ const useDropzone = <TRouter extends void | FileRouter = void>({
     onFileDialogError,
     onFileDialogOpen,
     disabled,
+    autoUpload,
   });
 
   disabled = disabled || internalDisabled;
@@ -341,7 +343,7 @@ const useDropzone = <TRouter extends void | FileRouter = void>({
     isFocused: isFocused && !disabled,
     getInputProps,
     getDropzoneRootProps: getRootProps,
-    upload: disabled ? noopPromise : upload,
+    upload: disabled || autoUpload ? noopPromise : upload,
     openFileDialog: disabled ? noop : openFileDialog,
     reset,
   };

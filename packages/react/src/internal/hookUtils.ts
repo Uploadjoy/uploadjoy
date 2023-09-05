@@ -1,6 +1,6 @@
 "use client";
 /**
- * This file contains common util functions and hooks used by the useInput and    useDropzone hooks.
+ * This file contains common util functions and hooks used by the useInput and useDropzone hooks.
  */
 
 import {
@@ -44,6 +44,7 @@ export function useHelpers<TRouter extends void | FileRouter = void>({
   onFileDialogError,
   disabled,
   clientCallbacks,
+  autoUpload,
 }: {
   endpoint: EndpointHelper<TRouter>;
   onFileDialogCancel?: () => void;
@@ -53,6 +54,7 @@ export function useHelpers<TRouter extends void | FileRouter = void>({
   state: UseInputState | UseDropzoneState;
   disabled: boolean;
   clientCallbacks: UseInputOptions["clientCallbacks"];
+  autoUpload?: boolean;
 }) {
   const { isFileDialogActive, readyToUpload, acceptedFiles, presignedUrls } =
     state;
@@ -127,6 +129,34 @@ export function useHelpers<TRouter extends void | FileRouter = void>({
     };
   }, [inputRef, isFileDialogActive, onFileDialogCancelCb, fsAccessApiWorksRef]);
 
+  const upload = useCallback(async () => {
+    if (!presignedUrls) {
+      console.log("No presigned URLs, cannot upload files");
+      return;
+    }
+    try {
+      if (access && !disabled && readyToUpload) {
+        dispatch({ type: "setIsUploading" });
+        await uploadFiles({
+          presignedUrls,
+          files: acceptedFiles,
+          clientCallbacks,
+        });
+        dispatch({ type: "setDoneUploading" });
+      }
+    } catch (e) {
+      // TODO: better error handling here, just reset for now
+      dispatch({ type: "reset" });
+    }
+  }, [acceptedFiles, presignedUrls]);
+
+  // autoUpload if autoUpload is true and setFiles has been called
+  useEffect(() => {
+    if (autoUpload && readyToUpload) {
+      upload();
+    }
+  }, [state.readyToUpload]);
+
   const setFiles = useCallback(
     async (files: File[]) => {
       const errors: InputError[] = [];
@@ -152,6 +182,7 @@ export function useHelpers<TRouter extends void | FileRouter = void>({
           readyToUpload: true,
           type: "setFiles",
         });
+
         return;
       }
 
@@ -246,27 +277,6 @@ export function useHelpers<TRouter extends void | FileRouter = void>({
     onFileDialogErrCb,
     multiple,
   ]);
-
-  const upload = useCallback(async () => {
-    if (!presignedUrls) {
-      console.log("No presigned URLs, cannot upload files");
-      return;
-    }
-    try {
-      if (access && !disabled && readyToUpload) {
-        dispatch({ type: "setIsUploading" });
-        await uploadFiles({
-          presignedUrls,
-          files: acceptedFiles,
-          clientCallbacks,
-        });
-        dispatch({ type: "setDoneUploading" });
-      }
-    } catch (e) {
-      // TODO: better error handling here, just reset for now
-      dispatch({ type: "reset" });
-    }
-  }, [acceptedFiles, presignedUrls]);
 
   // eslint-disable-next-line @typescript-eslint/ban-types
   const composeHandler = (fn: Function) => {
