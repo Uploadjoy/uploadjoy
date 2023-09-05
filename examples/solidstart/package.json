@@ -1,5 +1,6 @@
 {
   "name": "@examples/solid-start",
+  "version": "0.1.0",
   "scripts": {
     "dev": "solid-start dev --port 3003",
     "build": "solid-start build",
